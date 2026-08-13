@@ -1,0 +1,113 @@
+/* ===== Categories Section ===== */
+.categories {
+  padding: var(--space-4xl) 0;
+  background: var(--color-neutral);
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-xl);
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+.category-card {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  cursor: pointer;
+}
+
+.category-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.category-card:hover .category-card-img {
+  transform: scale(1.06);
+}
+
+.category-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(15, 30, 25, 0.95) 0%,
+    rgba(20, 45, 38, 0.8) 40%,
+    rgba(26, 60, 52, 0.2) 75%,
+    rgba(26, 60, 52, 0) 100%
+  );
+  transition: background var(--transition-base);
+}
+
+.category-card:hover .category-card-overlay {
+  background: linear-gradient(
+    to top,
+    rgba(15, 30, 25, 0.98) 0%,
+    rgba(20, 45, 38, 0.9) 45%,
+    rgba(26, 60, 52, 0.4) 80%,
+    rgba(26, 60, 52, 0) 100%
+  );
+}
+
+.category-card-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-xl);
+  z-index: 2;
+}
+
+.category-card-content h3 {
+  font-family: var(--font-headline);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-white);
+  margin-bottom: 0.25rem;
+}
+
+.category-card-content p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: var(--space-md);
+  line-height: 1.5;
+}
+
+.category-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-secondary);
+  transition: gap var(--transition-fast);
+}
+
+.category-link:hover {
+  gap: 0.75rem;
+}
+
+.category-link svg {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--transition-fast);
+}
+
+.category-card:hover .category-link svg {
+  transform: translateX(4px);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .categories-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+}
