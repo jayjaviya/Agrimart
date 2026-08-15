@@ -1,0 +1,254 @@
+/* ===== Login Page ===== */
+.login-page {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* --- Image Pane (Right) --- */
+.login-image-pane {
+  flex: 1;
+  background: linear-gradient(
+      to bottom,
+      rgba(15, 35, 30, 0.1) 0%,
+      rgba(15, 35, 30, 0.3) 40%,
+      rgba(15, 35, 30, 0.95) 100%
+    ),
+    url('../../assets/images/hero-farm.png') center/cover no-repeat;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4rem;
+  color: var(--color-white);
+}
+
+.login-logo {
+  font-family: var(--font-headline);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-white);
+  text-decoration: none;
+}
+
+.login-branding-text h1 {
+  font-family: var(--font-headline);
+  font-size: clamp(3.5rem, 5vw, 5.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  margin-bottom: 1.5rem;
+}
+
+.login-branding-text p {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  max-width: 480px;
+  opacity: 0.9;
+}
+
+/* --- Form Pane (Left) --- */
+.login-form-pane {
+  flex: 1;
+  max-width: 640px;
+  background-color: #FAFAFA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-form-container h2 {
+  font-family: var(--font-headline);
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-black);
+  margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+  color: var(--color-neutral-600);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 2.5rem;
+}
+
+/* --- Form Inputs --- */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.input-group {
+  position: relative;
+  width: 100%;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 0.75rem 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-neutral-300);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-black);
+  transition: border-color var(--transition-fast);
+}
+
+.input-group input::placeholder {
+  color: var(--color-neutral-500);
+}
+
+.input-group input:focus {
+  outline: none;
+  border-bottom-color: var(--color-primary);
+}
+
+/* Eye Icon Toggle */
+.btn-toggle-password {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-neutral-500);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+}
+
+.btn-toggle-password:hover {
+  color: var(--color-primary);
+}
+
+/* --- Login Options (Remember Me & Forgot Pass) --- */
+.login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.login-remember {
+  margin-bottom: 0;
+}
+
+.login-remember .terms-text {
+  font-size: 0.85rem;
+  color: var(--color-neutral-600);
+}
+
+.forgot-password {
+  font-size: 0.85rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+/* --- Submit Button --- */
+.btn-login {
+  width: 100%;
+  background-color: #05261F;
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.btn-login:hover {
+  background-color: #0A352C;
+}
+
+/* --- Security Note & Links --- */
+.security-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  color: var(--color-neutral-500);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.signup-link {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: var(--color-neutral-600);
+}
+
+.signup-link a {
+  color: var(--color-black);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}
+
+.login-footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2.5rem;
+}
+
+.login-footer-links a {
+  font-size: 0.8rem;
+  color: var(--color-neutral-500);
+  text-decoration: none;
+}
+
+.login-footer-links a:hover {
+  color: var(--color-primary);
+}
+
+/* --- Responsive --- */
+@media (max-width: 900px) {
+  .login-page {
+    /* Stack vertically on mobile. Form at bottom, Image at top */
+    flex-direction: column-reverse; 
+  }
+  
+  .login-image-pane {
+    flex: none;
+    height: 350px;
+    padding: 2rem;
+  }
+  
+  .login-branding-text h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .login-branding-text p {
+    display: none;
+  }
+
+  .login-form-pane {
+    max-width: 100%;
+    padding: 3rem 1.5rem;
+  }
+}

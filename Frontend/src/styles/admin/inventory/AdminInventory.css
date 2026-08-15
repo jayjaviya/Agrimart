@@ -1,0 +1,476 @@
+/* ===== Admin Inventory Management Page ===== */
+.admin-inventory-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+}
+
+/* --- Left Column --- */
+.inv-main-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* KPI Cards */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.kpi-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px; /* less rounded in mockup */
+  padding: 20px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.kpi-card.normal-top { border-left: 4px solid #1a4d33; }
+.kpi-card.warning-top { border-left: 4px solid #000000; }
+.kpi-card.critical-top { border-left: 4px solid #dc2626; }
+.kpi-card.success-top { border-left: 4px solid #86efac; }
+
+.kpi-header h3 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kpi-content {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.kpi-content h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.kpi-content h2.critical-text {
+  color: #dc2626;
+}
+
+.kpi-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.kpi-tag.warning-tag {
+  background-color: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #0f172a;
+}
+
+.kpi-tag.critical-tag {
+  background-color: #fee2e2;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #dc2626;
+}
+
+.kpi-tag.success-tag {
+  color: #10b981;
+}
+
+/* Inventory Table Panel */
+.inv-table-container {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.inv-table-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+.left-filters {
+  display: flex;
+  gap: 12px;
+}
+
+.filter-select {
+  padding: 8px 32px 8px 12px;
+  border: 1px solid #cbd5e1;
+  background-color: white;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #475569;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.btn-add-inv {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #0f201d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.inv-table-wrapper {
+  overflow-x: auto;
+}
+
+.inv-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inv-table th {
+  text-align: left;
+  padding: 16px 24px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  background-color: #f1ebd7; /* Matching the mockup beige header */
+  text-transform: uppercase;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.actions-header {
+  text-align: right !important;
+}
+
+.inv-table td {
+  padding: 16px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+  font-size: 0.9rem;
+  color: #1e293b;
+}
+
+.inv-table tr:last-child td {
+  border-bottom: none;
+}
+
+.row-critical {
+  background-color: #fef2f2;
+}
+
+.inv-product-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 220px;
+}
+
+.inv-product-cell img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  background: white;
+}
+
+.inv-product-cell span {
+  font-weight: 600;
+  white-space: normal;
+  line-height: 1.3;
+}
+
+.stock-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stock-qty {
+  font-weight: 700;
+}
+
+.stock-min {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.warning-text { color: #000; } /* In mockup it's black for low stock */
+.critical-text { color: #dc2626; }
+
+.inv-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.inv-badge.normal {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.inv-badge.warning {
+  background-color: #e2e8f0;
+  color: #0f172a;
+}
+
+.inv-badge.critical {
+  background-color: #fca5a5;
+  color: #991b1b;
+}
+
+.date-cell {
+  color: #475569;
+  font-size: 0.85rem;
+}
+
+.actions-cell {
+  text-align: right;
+}
+
+.btn-adjust {
+  background: white;
+  border: 1px solid #cbd5e1;
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-adjust:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+/* --- Right Column --- */
+.inv-side-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sidebar-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.sidebar-body {
+  padding: 20px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* Adjust Form */
+.adjust-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.selected-item-info .label {
+  display: block;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.selected-item-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.selected-item-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.toggle-group {
+  display: flex;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.toggle-btn {
+  flex: 1;
+  background: #f8fafc;
+  border: none;
+  padding: 8px 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+}
+
+.toggle-btn.active {
+  background: #f1ebd7; /* beige active state */
+  color: #0f172a;
+}
+
+.toggle-btn:first-child {
+  border-right: 1px solid #cbd5e1;
+}
+
+.adjust-form .form-group {
+  margin-bottom: 0;
+}
+
+.adjust-form label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.adjust-form input,
+.adjust-form select,
+.adjust-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.reason-notes {
+  margin-top: 8px;
+  min-height: 80px;
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.form-actions button {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.form-actions .btn-cancel {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+
+.form-actions .btn-confirm {
+  background: #0f201d;
+  border: none;
+  color: white;
+}
+
+/* Activity List */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-item {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-item p {
+  margin: 0 0 6px 0;
+  font-size: 0.85rem;
+  color: #1e293b;
+  line-height: 1.4;
+}
+
+.activity-item span {
+  display: block;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .inventory-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .kpi-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .kpi-row {
+    grid-template-columns: 1fr;
+  }
+  .inv-table-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+}
