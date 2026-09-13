@@ -1,12 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 import { Search, ShoppingCart, User } from 'lucide-react';
+import whiteLogo from '../../assets/images/logo/whiteThemeLogo.png';
+import blackLogo from '../../assets/images/logo/blackThemeLogo.png';
 import '../../styles/shop/Navbar.css';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
+  const { user, logout } = useContext(AuthContext);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,14 +31,12 @@ const Navbar = () => {
       <div className="navbar-inner">
         {/* Logo */}
         <Link to="/" className="navbar-logo">
-          <span className="navbar-logo-icon">
-            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2" fill="none" />
-              <path d="M16 8c0 0-6 4-6 10s6 6 6 6 6 0 6-6-6-10-6-10z" fill="currentColor" opacity="0.3"/>
-              <path d="M16 6c-2 4-2 8 0 12M12 12c2-1 6-1 8 0M11 18c2 1 7 1 10 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-          </span>
-          AgriMart
+          <img 
+            src={isTransparent ? blackLogo : whiteLogo} 
+            alt="AgriMart Logo" 
+            className="navbar-brand-logo"
+            style={{ height: '55px', width: 'auto', display: 'block' }}
+          />
         </Link>
 
         {/* Navigation Links */}
@@ -45,12 +48,39 @@ const Navbar = () => {
 
         {/* Action Icons */}
         <div className="nav-actions">
-          <button className="nav-icon" id="search-btn" aria-label="Search">
-            <Search />
-          </button>
-          <Link to="/login" className="nav-icon" aria-label="Account">
-            <User />
-          </Link>
+          
+          {user ? (
+            <div 
+              className="nav-user-wrapper" 
+              onMouseEnter={() => setDropdownOpen(true)} 
+              onMouseLeave={() => setDropdownOpen(false)}
+            >
+              <div className="nav-icon" aria-label="Account">
+                <User />
+              </div>
+              
+              <div className={`nav-dropdown ${dropdownOpen ? 'nav-dropdown--open' : ''}`}>
+                <div className="nav-dropdown-header">
+                  <strong>My Account</strong>
+                  <span>{user.phone || user.email}</span>
+                </div>
+                <Link to="/orders" className="nav-dropdown-item">My Orders</Link>
+                <Link to="/addresses" className="nav-dropdown-item">Saved Addresses</Link>
+                <Link to="/wishlist" className="nav-dropdown-item">Wishlist & Favorites</Link>
+                <Link to="/support" className="nav-dropdown-item">Help Center</Link>
+                <div className="nav-dropdown-divider"></div>
+                <button onClick={logout} className="nav-dropdown-item nav-dropdown-logout">
+                  Log Out
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="auth-buttons">
+              <Link to="/login" className="btn-login-nav">Log In</Link>
+              <Link to="/signup" className="btn-signup-nav">Sign Up</Link>
+            </div>
+          )}
+
           <Link to="/cart" className="nav-icon" aria-label="Cart">
             <ShoppingCart />
           </Link>
@@ -73,10 +103,33 @@ const Navbar = () => {
         <Link to="/" className="nav-link nav-link--active" onClick={toggleMenu}>Home</Link>
         <Link to="/products" className="nav-link" onClick={toggleMenu}>Products</Link>
         <Link to="/contact" className="nav-link" onClick={toggleMenu}>Contact</Link>
-        <div className="nav-actions" style={{ display: 'flex' }}>
-          <button className="nav-icon" aria-label="Search"><Search /></button>
+        <div className="nav-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
           <Link to="/cart" className="nav-icon" aria-label="Cart"><ShoppingCart /></Link>
-          <Link to="/login" className="nav-icon" aria-label="Account"><User /></Link>
+          
+          {user ? (
+            <div style={{ width: '100%', marginTop: '10px', background: 'rgba(0,0,0,0.03)', padding: '15px', borderRadius: '8px' }}>
+              <div style={{ marginBottom: '15px', paddingBottom: '10px', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
+                <strong style={{ display: 'block', color: 'var(--color-primary)' }}>My Account</strong>
+                <span style={{ fontSize: '0.85rem', color: '#666' }}>{user.phone || user.email}</span>
+              </div>
+              <Link to="/orders" className="nav-link" onClick={toggleMenu} style={{ display: 'block', marginBottom: '10px' }}>My Orders</Link>
+              <Link to="/addresses" className="nav-link" onClick={toggleMenu} style={{ display: 'block', marginBottom: '10px' }}>Saved Addresses</Link>
+              <Link to="/wishlist" className="nav-link" onClick={toggleMenu} style={{ display: 'block', marginBottom: '10px' }}>Wishlist & Favorites</Link>
+              <Link to="/support" className="nav-link" onClick={toggleMenu} style={{ display: 'block', marginBottom: '15px' }}>Help Center</Link>
+              <button 
+                onClick={() => { logout(); toggleMenu(); }} 
+                className="btn-login-nav" 
+                style={{ width: '100%', textAlign: 'center', color: 'red', borderColor: 'red' }}
+              >
+                Log Out
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: '10px', width: '100%', marginTop: '10px' }}>
+              <Link to="/login" className="btn-login-nav" style={{flex: 1, textAlign: 'center'}}>Log In</Link>
+              <Link to="/signup" className="btn-signup-nav" style={{flex: 1, textAlign: 'center'}}>Sign Up</Link>
+            </div>
+          )}
         </div>
       </div>
     </nav>

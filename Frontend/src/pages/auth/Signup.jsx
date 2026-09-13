@@ -1,11 +1,61 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 import { Eye, EyeOff, Lock } from 'lucide-react';
 import '../../styles/auth/Signup.css';
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
+  const [error, setError] = useState('');
+  
+  const { register } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const validateForm = () => {
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      setError('Please fill in all required fields');
+      return false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return false;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return false;
+    }
+    return true;
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (!validateForm()) return;
+
+    const res = await register(formData.name, formData.email, formData.password, formData.phone);
+    if (res.success) {
+      if (res.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
+    } else {
+      setError(res.message);
+    }
+  };
 
   return (
     <main className="signup-page">
@@ -26,23 +76,28 @@ const Signup = () => {
           <h2>Create Account</h2>
           <p className="signup-subtitle">Enter your details to access professional agricultural resources.</p>
 
-          <form className="signup-form" onSubmit={e => e.preventDefault()}>
+          <form className="signup-form" onSubmit={handleSubmit}>
+            {error && <div style={{ color: 'red', marginBottom: '15px' }}>{error}</div>}
+            
             <div className="input-group">
-              <input type="text" placeholder="Full Name" required />
+              <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} required />
             </div>
             
             <div className="input-group">
-              <input type="email" placeholder="Email Address" required />
+              <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleChange} required />
             </div>
 
             <div className="input-group">
-              <input type="tel" placeholder="Phone Number (Optional)" />
+              <input type="tel" name="phone" placeholder="Phone Number (Optional)" value={formData.phone} onChange={handleChange} />
             </div>
 
             <div className="input-group">
               <input 
                 type={showPassword ? "text" : "password"} 
+                name="password"
                 placeholder="Password" 
+                value={formData.password}
+                onChange={handleChange}
                 required 
               />
               <button 
@@ -58,7 +113,10 @@ const Signup = () => {
             <div className="input-group">
               <input 
                 type={showConfirmPassword ? "text" : "password"} 
+                name="confirmPassword"
                 placeholder="Confirm Password" 
+                value={formData.confirmPassword}
+                onChange={handleChange}
                 required 
               />
               <button 

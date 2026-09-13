@@ -13,13 +13,18 @@ import Checkout from './pages/shop/Checkout';
 import OrderSuccess from './pages/shop/OrderSuccess';
 import OrderTrack from './pages/shop/OrderTrack';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminLogin from './pages/admin/AdminLogin';
 import AdminOrders from './pages/admin/orders/AdminOrders';
 import AdminOrderDetails from './pages/admin/orders/AdminOrderDetails';
 import AdminProducts from './pages/admin/products/AdminProducts';
 import AdminAddProduct from './pages/admin/products/AdminAddProduct';
+import AdminEditProduct from './pages/admin/products/AdminEditProduct';
 import AdminInventory from './pages/admin/inventory/AdminInventory';
 import AdminCustomers from './pages/admin/customers/AdminCustomers';
 import AdminCustomerDetails from './pages/admin/customers/AdminCustomerDetails';
+import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminSupport from './pages/admin/support/AdminSupport';
 import AdminTicketDetails from './pages/admin/support/AdminTicketDetails';
 import AdminReports from './pages/admin/reports/AdminReports';
@@ -29,66 +34,64 @@ import 'lenis/dist/lenis.css';
 
 function App() {
   const location = useLocation();
-  const isAuthPage = location.pathname === '/signup' || location.pathname === '/login';
+  const isAuthPage = location.pathname === '/signup' || location.pathname === '/login' || location.pathname === '/admin/login';
   const isAdminRoute = location.pathname.startsWith('/admin');
   const showNavFooter = !isAuthPage && !isAdminRoute;
 
-  // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  // Initialize Lenis for smooth scrolling
   useEffect(() => {
     const lenis = new Lenis({
-      lerp: 0.15, // વધુ સ્નેપી (snappy) અને ફાસ્ટ રિસ્પોન્સ માટે
+      lerp: 0.15,
       smoothWheel: true,
-      wheelMultiplier: 1.5, // માઉસ વ્હીલ ફેરવતા થોડું વધારે સ્ક્રોલ થશે (ઝડપી લાગશે)
+      wheelMultiplier: 1.5,
     });
 
     function raf(time) {
       lenis.raf(time);
       requestAnimationFrame(raf);
     }
-
     requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
+    return () => lenis.destroy();
   }, []);
 
   return (
-    <>
-      {showNavFooter && <Navbar />}
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/product/:id" element={<ProductDetails />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/order-success" element={<OrderSuccess />} />
-        <Route path="/order-track" element={<OrderTrack />} />
-        
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/orders" element={<AdminOrders />} />
-        <Route path="/admin/orders/:id" element={<AdminOrderDetails />} />
-        <Route path="/admin/products" element={<AdminProducts />} />
-        <Route path="/admin/products/add" element={<AdminAddProduct />} />
-        <Route path="/admin/inventory" element={<AdminInventory />} />
-        <Route path="/admin/customers" element={<AdminCustomers />} />
-        <Route path="/admin/customers/:id" element={<AdminCustomerDetails />} />
-        <Route path="/admin/support" element={<AdminSupport />} />
-        <Route path="/admin/support/:id" element={<AdminTicketDetails />} />
-        <Route path="/admin/reports" element={<AdminReports />} />
-        <Route path="/admin/settings" element={<AdminSettings />} />
-      </Routes>
-      {showNavFooter && <Footer />}
-    </>
+    <AuthProvider>
+      <CartProvider>
+        {showNavFooter && <Navbar />}
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-success" element={<OrderSuccess />} />
+          <Route path="/order-track" element={<OrderTrack />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<ProtectedRoute adminOnly={true}><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/orders" element={<ProtectedRoute adminOnly={true}><AdminOrders /></ProtectedRoute>} />
+          <Route path="/admin/orders/:id" element={<ProtectedRoute adminOnly={true}><AdminOrderDetails /></ProtectedRoute>} />
+          <Route path="/admin/products" element={<ProtectedRoute adminOnly={true}><AdminProducts /></ProtectedRoute>} />
+          <Route path="/admin/products/add" element={<ProtectedRoute adminOnly={true}><AdminAddProduct /></ProtectedRoute>} />
+          <Route path="/admin/products/edit/:id" element={<ProtectedRoute adminOnly={true}><AdminEditProduct /></ProtectedRoute>} />
+          <Route path="/admin/inventory" element={<ProtectedRoute adminOnly={true}><AdminInventory /></ProtectedRoute>} />
+          <Route path="/admin/customers" element={<ProtectedRoute adminOnly={true}><AdminCustomers /></ProtectedRoute>} />
+          <Route path="/admin/customers/:id" element={<ProtectedRoute adminOnly={true}><AdminCustomerDetails /></ProtectedRoute>} />
+          <Route path="/admin/support" element={<ProtectedRoute adminOnly={true}><AdminSupport /></ProtectedRoute>} />
+          <Route path="/admin/support/:id" element={<ProtectedRoute adminOnly={true}><AdminTicketDetails /></ProtectedRoute>} />
+          <Route path="/admin/reports" element={<ProtectedRoute adminOnly={true}><AdminReports /></ProtectedRoute>} />
+          <Route path="/admin/settings" element={<ProtectedRoute adminOnly={true}><AdminSettings /></ProtectedRoute>} />
+        </Routes>
+        {showNavFooter && <Footer />}
+      </CartProvider>
+    </AuthProvider>
   );
 }
 

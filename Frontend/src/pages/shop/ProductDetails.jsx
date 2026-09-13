@@ -1,26 +1,54 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { CartContext } from '../../context/CartContext';
 import { Star, Truck, Heart, ChevronRight, Minus, Plus, Droplets, ArrowUpCircle } from 'lucide-react';
 import '../../styles/shop/ProductDetails.css';
 
-import mainImg from '../../assets/images/premium-seeds.png';
-import img2 from '../../assets/images/fertilizers-nutrition.png';
-import img3 from '../../assets/images/pivot-irrigation.png';
-import img4 from '../../assets/images/tools-equipment.png';
-
 const ProductDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { addToCart } = useContext(CartContext);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
 
-  const images = [mainImg, img2, img3, img4];
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await fetch(`http://localhost:5001/api/products/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setProduct(data);
+        } else {
+          console.error('Product not found');
+        }
+      } catch (err) {
+        console.error('Error fetching product', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (id) fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return <main className="product-details-page"><div className="pd-container" style={{padding: '50px', textAlign: 'center'}}>Loading...</div></main>;
+  }
+
+  if (!product) {
+    return <main className="product-details-page"><div className="pd-container" style={{padding: '50px', textAlign: 'center'}}>Product not found!</div></main>;
+  }
+
+  const images = [product.image]; // we only have 1 image per product right now in db
 
   const handleDecrease = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
 
   const handleIncrease = () => {
-    setQuantity(quantity + 1);
+    // optional: limit by stockQuantity
+    if (quantity < (product.stockQuantity || 100)) setQuantity(quantity + 1);
   };
 
   return (
@@ -31,9 +59,9 @@ const ProductDetails = () => {
         <nav className="pd-breadcrumbs">
           <Link to="/">Home</Link>
           <ChevronRight size={14} className="breadcrumb-icon" />
-          <Link to="/products">Seed Varieties</Link>
+          <Link to={`/products?category=${product.category}`}>{product.category}</Link>
           <ChevronRight size={14} className="breadcrumb-icon" />
-          <span className="current">ProYield Hybrid Corn</span>
+          <span className="current">{product.name}</span>
         </nav>
 
         {/* Top Layout */}
@@ -53,39 +81,32 @@ const ProductDetails = () => {
               ))}
             </div>
             <div className="pd-main-image">
-              <img src={images[activeImage]} alt="ProYield Hybrid Corn Seeds" />
+              <img src={images[activeImage]} alt={product.name} />
             </div>
           </div>
 
           {/* Product Info */}
           <div className="pd-info">
-            <h1 className="pd-title">ProYield Hybrid Corn<br/>Seeds</h1>
+            <h1 className="pd-title">{product.name}</h1>
             
             <div className="pd-rating">
               <div className="stars">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={16} fill={i < 4 ? "var(--color-secondary)" : (i === 4 ? "url(#half)" : "none")} color="var(--color-secondary)" />
+                  <Star key={i} size={16} fill={i < Math.floor(product.rating || 5) ? "var(--color-secondary)" : (i === 4 ? "url(#half)" : "none")} color="var(--color-secondary)" />
                 ))}
               </div>
-              <span className="rating-text">4.8 (124 reviews)</span>
+              <span className="rating-text">{(product.rating || 5.0).toFixed(1)} ({product.reviews || 0} reviews)</span>
             </div>
 
             <div className="pd-price-row">
-              <span className="pd-price">$340.00</span>
-              <span className="pd-price-original">$380.00</span>
+              <span className="pd-price">${product.price.toFixed(2)}</span>
             </div>
 
             <p className="pd-description">
-              Engineered for maximum yield in diverse climates, ProYield Hybrid Corn offers superior standability and exceptional drought tolerance. Ideal for professional operations demanding consistent, high-volume harvests.
+              {product.description || 'No description available for this product.'}
             </p>
 
             <div className="pd-badges">
-              <span className="pd-badge">
-                <ArrowUpCircle size={14} /> High Germination Rate
-              </span>
-              <span className="pd-badge">
-                <Droplets size={14} /> Drought Resistant
-              </span>
               <span className="pd-badge">
                 <Star size={14} /> Professional Grade
               </span>
@@ -100,12 +121,20 @@ const ProductDetails = () => {
                   <input type="number" value={quantity} readOnly />
                   <button onClick={handleIncrease}><Plus size={16} /></button>
                 </div>
-                <span className="pd-unit-text">50lb Bag</span>
+                <span className="pd-unit-text">Units ({product.stockQuantity || 0} available)</span>
               </div>
 
               <div className="pd-buttons-row">
-                <button className="pd-btn pd-btn-primary">Add to Cart</button>
-                <button className="pd-btn pd-btn-secondary">Buy Now</button>
+                <button 
+                  className="pd-btn-add"
+                  onClick={() => {
+                    addToCart(product, quantity);
+                    navigate('/cart');
+                  }}
+                >
+                  ADD TO CART
+                </button>
+                <button className="pd-btn pd-btn-secondary" onClick={() => navigate('/checkout')}>Buy Now</button>
                 <button className="pd-btn pd-btn-icon"><Heart size={20} /></button>
               </div>
             </div>
@@ -131,28 +160,16 @@ const ProductDetails = () => {
           
           <div className="pd-specs-grid">
             <div className="pd-spec-item">
-              <span className="spec-label">Weight</span>
-              <span className="spec-value">50 lbs</span>
+              <span className="spec-label">SKU</span>
+              <span className="spec-value">{product.sku || 'N/A'}</span>
             </div>
             <div className="pd-spec-item">
-              <span className="spec-label">Coverage</span>
-              <span className="spec-value">Approx. 2.5 Acres</span>
+              <span className="spec-label">Category</span>
+              <span className="spec-value">{product.category}</span>
             </div>
             <div className="pd-spec-item">
-              <span className="spec-label">Relative Maturity</span>
-              <span className="spec-value">110 Days</span>
-            </div>
-            <div className="pd-spec-item">
-              <span className="spec-label">Trait Package</span>
-              <span className="spec-value">Conventional</span>
-            </div>
-            <div className="pd-spec-item">
-              <span className="spec-label">Kernel Rows</span>
-              <span className="spec-value">16-18</span>
-            </div>
-            <div className="pd-spec-item">
-              <span className="spec-label">Test Weight</span>
-              <span className="spec-value">Excellent</span>
+              <span className="spec-label">Meta</span>
+              <span className="spec-value">{product.meta || 'N/A'}</span>
             </div>
           </div>
         </section>

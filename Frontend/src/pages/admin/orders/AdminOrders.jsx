@@ -1,52 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import AdminLayout from '../../../components/admin/AdminLayout';
 import '../../../styles/admin/orders/AdminOrders.css';
 
 const AdminOrders = () => {
-  const orders = [
-    {
-      id: '#AGM-9082',
-      customerInitials: 'MA',
-      customerName: 'Midwest Agritech Co.',
-      products: 'Irrigation Kit Pro, 50lb Hybrid Corn Seed, +2...',
-      total: '$4,250.00',
-      payment: 'Paid',
-      status: 'Processing',
-      date: 'Aug 14, 2026'
-    },
-    {
-      id: '#AGM-9081',
-      customerInitials: 'DF',
-      customerName: 'Dakota Farms Ltd.',
-      products: 'Industrial Tractor Tires (Set of 4)',
-      total: '$2,800.00',
-      payment: 'Paid',
-      status: 'Shipped',
-      date: 'Aug 13, 2026'
-    },
-    {
-      id: '#AGM-9080',
-      customerInitials: 'GV',
-      customerName: 'Green Valley Orchards',
-      products: 'Organic Fertilizer Bulk Pallet (100 bags)',
-      total: '$1,450.00',
-      payment: 'Failed',
-      status: 'Pending',
-      date: 'Aug 12, 2026'
-    },
-    {
-      id: '#AGM-9079',
-      customerInitials: 'TS',
-      customerName: 'Tri-State Supply',
-      products: 'Automated Feeder System v2',
-      total: '$5,600.00',
-      payment: 'Paid',
-      status: 'Delivered',
-      date: 'Aug 10, 2026'
-    }
-  ];
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch('http://localhost:5001/api/orders');
+        if (res.ok) {
+          const data = await res.json();
+          setOrders(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch orders', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrders();
+  }, []);
+
+  const getInitials = (name) => {
+    if (!name) return '??';
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  };
+
+  const getProductsSummary = (items) => {
+    if (!items || items.length === 0) return 'No items';
+    if (items.length === 1) return items[0].name;
+    return `${items[0].name} +${items.length - 1} more`;
+  };
 
   return (
     <AdminLayout 
@@ -97,24 +85,29 @@ const AdminOrders = () => {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order, idx) => (
-                  <tr key={idx}>
+                {loading ? (
+                  <tr><td colSpan="7" style={{textAlign: 'center', padding: '20px'}}>Loading orders...</td></tr>
+                ) : orders.length === 0 ? (
+                  <tr><td colSpan="7" style={{textAlign: 'center', padding: '20px'}}>No orders found.</td></tr>
+                ) : (
+                  orders.map((order) => (
+                  <tr key={order._id}>
                     <td className="order-id">
-                      <Link to={`/admin/orders/${order.id.replace('#', '')}`} style={{ color: '#0f172a', textDecoration: 'none' }}>
-                        {order.id}
+                      <Link to={`/admin/orders/${order.orderId.replace('#', '')}`} style={{ color: '#0f172a', textDecoration: 'none' }}>
+                        {order.orderId}
                       </Link>
                     </td>
                     <td>
                       <div className="customer-cell">
-                        <div className="customer-avatar">{order.customerInitials}</div>
+                        <div className="customer-avatar">{getInitials(order.customerName)}</div>
                         <div className="customer-name">{order.customerName}</div>
                       </div>
                     </td>
-                    <td className="products-cell" title={order.products}>{order.products}</td>
-                    <td className="total-cell">{order.total}</td>
+                    <td className="products-cell" title={getProductsSummary(order.items)}>{getProductsSummary(order.items)}</td>
+                    <td className="total-cell">${order.totalAmount?.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                     <td>
-                      <span className={`payment-badge payment-${order.payment.toLowerCase()}`}>
-                        {order.payment}
+                      <span className="payment-badge payment-paid">
+                        Paid
                       </span>
                     </td>
                     <td>
@@ -122,15 +115,16 @@ const AdminOrders = () => {
                         {order.status}
                       </span>
                     </td>
-                    <td style={{ color: '#475569', fontSize: '0.85rem' }}>{order.date}</td>
+                    <td style={{ color: '#475569', fontSize: '0.85rem' }}>{new Date(order.createdAt).toLocaleDateString()}</td>
                   </tr>
-                ))}
+                ))
+                )}
               </tbody>
             </table>
           </div>
           
           <div className="pagination-footer">
-            <div className="pagination-info">Showing 1 to 4 of 128 orders</div>
+            <div className="pagination-info">Showing {orders.length} orders</div>
             <div className="pagination-controls">
               <button className="page-btn">&lt;</button>
               <button className="page-btn active">1</button>

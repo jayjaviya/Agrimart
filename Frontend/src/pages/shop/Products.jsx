@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { CartContext } from '../../context/CartContext';
 import { Search, Star } from 'lucide-react';
 import seedsImg from '../../assets/images/premium-seeds.png';
 import fertilizersImg from '../../assets/images/fertilizers-nutrition.png';
@@ -15,7 +16,8 @@ const dummyProducts = [
     rating: 4.8,
     reviews: 120,
     price: 145.00,
-    image: seedsImg
+    image: seedsImg,
+    meta: 'AgriPro'
   },
   {
     id: 2,
@@ -24,7 +26,8 @@ const dummyProducts = [
     rating: 5.0,
     reviews: 45,
     price: 890.00,
-    image: irrigationImg
+    image: irrigationImg,
+    meta: 'TerraTech'
   },
   {
     id: 3,
@@ -33,21 +36,24 @@ const dummyProducts = [
     rating: 4.2,
     reviews: 88,
     price: 65.00,
-    image: fertilizersImg
+    image: fertilizersImg,
+    meta: 'YieldMaster'
   },
   {
     id: 4,
-    category: 'SPRAYERS',
+    category: 'TOOLS',
     name: 'AeroTech Heavy Duty Backpack Sprayer',
     rating: 4.6,
     reviews: 210,
     price: 120.00,
-    image: toolsImg 
+    image: toolsImg,
+    meta: 'AgriPro'
   }
 ];
 
 const Products = () => {
   const tabs = ['All Products', 'Seeds', 'Fertilizers', 'Crop Protection', 'Irrigation', 'Sprayers', 'Tools & Equipment'];
+  const { addToCart } = useContext(CartContext);
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -57,6 +63,37 @@ const Products = () => {
   const [activeTab, setActiveTab] = useState(
     categoryParam && tabs.includes(categoryParam) ? categoryParam : 'All Products'
   );
+
+  const [allProducts, setAllProducts] = useState(dummyProducts);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const [priceFilters, setPriceFilters] = useState({
+    'Under $50': false,
+    '$50 - $200': false,
+    '$200 - $1000': false,
+    'Over $1000': false
+  });
+
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch('http://localhost:5001/api/products');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setAllProducts(data);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch products', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     const currentCategory = new URLSearchParams(location.search).get('category');
@@ -76,16 +113,52 @@ const Products = () => {
     }
   };
 
+  const handlePriceChange = (label) => {
+    setPriceFilters(prev => ({ ...prev, [label]: !prev[label] }));
+  };
+
+
+  // Filter Logic
+  const filteredProducts = allProducts.filter(product => {
+    // Category match
+    if (activeTab !== 'All Products') {
+      if (product.category.toLowerCase() !== activeTab.toLowerCase()) return false;
+    }
+
+    // Search match
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      if (!product.name.toLowerCase().includes(query) && 
+          !(product.description && product.description.toLowerCase().includes(query))) {
+        return false;
+      }
+    }
+
+    // Price match
+    const activePrices = Object.keys(priceFilters).filter(k => priceFilters[k]);
+    if (activePrices.length > 0) {
+      let priceMatch = false;
+      if (priceFilters['Under $50'] && product.price < 50) priceMatch = true;
+      if (priceFilters['$50 - $200'] && product.price >= 50 && product.price <= 200) priceMatch = true;
+      if (priceFilters['$200 - $1000'] && product.price > 200 && product.price <= 1000) priceMatch = true;
+      if (priceFilters['Over $1000'] && product.price > 1000) priceMatch = true;
+      if (!priceMatch) return false;
+    }
+
+
+    return true;
+  });
+
   return (
     <main className="products-page">
       <div className="products-container">
         
-        <header className="products-header">
+        <header className="sp-header">
           <h1>Products for Better Farming</h1>
           <p>Explore quality products for every stage of your farming journey. High-performance equipment, premium seeds, and professional-grade supplies.</p>
           
-          <div className="products-controls">
-            <div className="products-tabs">
+          <div className="sp-controls">
+            <div className="sp-tabs">
               {tabs.map(tab => (
                 <button 
                   key={tab} 
@@ -97,63 +170,47 @@ const Products = () => {
               ))}
             </div>
 
-            <div className="products-search">
+            <div className="sp-search">
               <Search className="search-icon" size={20} />
-              <input type="text" placeholder="Search products..." />
+              <input 
+                type="text" 
+                placeholder="Search products..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
           </div>
         </header>
 
-        <div className="products-layout">
-          <aside className="products-sidebar">
-            <div className="filter-group">
+        <div className="sp-layout">
+          <aside className="sp-sidebar">
+            <div className="sp-filter-group">
               <h3>PRICE RANGE</h3>
-              <label className="checkbox-label">
-                <input type="checkbox" />
-                <span className="checkmark"></span>
-                Under $50
-              </label>
-              <label className="checkbox-label">
-                <input type="checkbox" defaultChecked />
-                <span className="checkmark"></span>
-                $50 - $200
-              </label>
-              <label className="checkbox-label">
-                <input type="checkbox" />
-                <span className="checkmark"></span>
-                $200 - $1000
-              </label>
-              <label className="checkbox-label">
-                <input type="checkbox" />
-                <span className="checkmark"></span>
-                Over $1000
-              </label>
+              {Object.keys(priceFilters).map(label => (
+                <label key={label} className="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    checked={priceFilters[label]} 
+                    onChange={() => handlePriceChange(label)}
+                  />
+                  <span className="checkmark"></span>
+                  {label}
+                </label>
+              ))}
             </div>
 
-            <div className="filter-group">
-              <h3>BRAND</h3>
-              <label className="checkbox-label">
-                <input type="checkbox" defaultChecked />
-                <span className="checkmark"></span>
-                AgriPro
-              </label>
-              <label className="checkbox-label">
-                <input type="checkbox" />
-                <span className="checkmark"></span>
-                YieldMaster
-              </label>
-              <label className="checkbox-label">
-                <input type="checkbox" />
-                <span className="checkmark"></span>
-                TerraTech
-              </label>
-            </div>
+
           </aside>
 
           <section className="products-grid-section">
-            <div className="products-grid-inner">
-              {dummyProducts.map(product => (
-                <Link to={`/product/${product.id}`} key={product.id} className="prod-card" style={{ textDecoration: 'none' }}>
+            <div className="sp-grid-inner">
+              {loading ? (
+                <p>Loading products...</p>
+              ) : filteredProducts.length === 0 ? (
+                <p>No products found matching your filters.</p>
+              ) : (
+                filteredProducts.map(product => (
+                <Link to={`/product/${product._id || product.id}`} key={product._id || product.id} className="prod-card" style={{ textDecoration: 'none' }}>
                   <div className="prod-card-img-wrap">
                     <img src={product.image} alt={product.name} />
                   </div>
@@ -164,19 +221,29 @@ const Products = () => {
                     <div className="prod-rating">
                       <div className="stars">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} size={12} fill={i < Math.floor(product.rating) ? "var(--color-secondary)" : "none"} color="var(--color-secondary)" />
+                          <Star key={i} size={12} fill={i < Math.floor(product.rating || 5) ? "var(--color-secondary)" : "none"} color="var(--color-secondary)" />
                         ))}
                       </div>
-                      <span className="rating-text">{product.rating.toFixed(1)} ({product.reviews})</span>
+                      <span className="rating-text">{(product.rating || 5.0).toFixed(1)} ({product.reviews || 0})</span>
                     </div>
 
                     <div className="prod-footer">
                       <span className="prod-price">${product.price.toFixed(2)}</span>
-                      <button className="prod-add-btn">ADD</button>
+                      <button 
+                        className="prod-add-btn"
+                        onClick={(e) => { 
+                          e.preventDefault(); 
+                          addToCart(product, 1);
+                          navigate('/cart'); 
+                        }}
+                      >
+                        ADD
+                      </button>
                     </div>
                   </div>
                 </Link>
-              ))}
+              ))
+              )}
             </div>
 
             <div className="load-more-wrap">

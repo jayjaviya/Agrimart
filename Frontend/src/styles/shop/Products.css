@@ -12,7 +12,7 @@
 }
 
 /* --- Header --- */
-.products-header h1 {
+.sp-header h1 {
   font-family: var(--font-headline);
   font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 800;
@@ -20,7 +20,7 @@
   margin-bottom: var(--space-md);
 }
 
-.products-header p {
+.sp-header p {
   color: var(--color-neutral-600);
   max-width: 600px;
   line-height: 1.6;
@@ -28,7 +28,7 @@
 }
 
 /* --- Controls Layout --- */
-.products-controls {
+.sp-controls {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -39,14 +39,14 @@
 }
 
 /* --- Search --- */
-.products-search {
+.sp-search {
   position: relative;
   width: 100%;
   max-width: 320px;
   margin-bottom: var(--space-sm);
 }
 
-.products-search .search-icon {
+.sp-search .search-icon {
   position: absolute;
   left: 1rem;
   top: 50%;
@@ -54,7 +54,7 @@
   color: var(--color-neutral-500);
 }
 
-.products-search input {
+.sp-search input {
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.5rem;
   border: 1px solid var(--color-neutral-300);
@@ -65,13 +65,13 @@
   transition: border-color var(--transition-fast);
 }
 
-.products-search input:focus {
+.sp-search input:focus {
   outline: none;
   border-color: var(--color-primary);
 }
 
 /* --- Tabs --- */
-.products-tabs {
+.sp-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-lg);
@@ -110,18 +110,18 @@
 }
 
 /* --- Layout --- */
-.products-layout {
+.sp-layout {
   display: grid;
   grid-template-columns: 240px 1fr;
   gap: var(--space-3xl);
 }
 
 /* --- Sidebar --- */
-.filter-group {
+.sp-filter-group {
   margin-bottom: var(--space-2xl);
 }
 
-.filter-group h3 {
+.sp-filter-group h3 {
   font-family: var(--font-headline);
   font-size: 0.8rem;
   font-weight: 700;
@@ -171,7 +171,7 @@
 }
 
 /* --- Product Grid --- */
-.products-grid-inner {
+.sp-grid-inner {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-lg);
@@ -305,21 +305,21 @@
 
 /* --- Responsive --- */
 @media (max-width: 1024px) {
-  .products-grid-inner {
+  .sp-grid-inner {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .products-layout {
+  .sp-layout {
     grid-template-columns: 1fr;
   }
   
-  .products-sidebar {
+  .sp-sidebar {
     display: none;
   }
 
-  .products-tabs {
+  .sp-tabs {
     overflow-x: auto;
     white-space: nowrap;
     padding-bottom: 0.5rem;
@@ -327,7 +327,7 @@
 }
 
 @media (max-width: 480px) {
-  .products-grid-inner {
+  .sp-grid-inner {
     grid-template-columns: 1fr;
   }
 }

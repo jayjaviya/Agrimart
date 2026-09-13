@@ -1,51 +1,89 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { CartContext } from '../../context/CartContext';
 import { Lock, ShieldCheck, Truck, ChevronDown, Edit2, ArrowRight, Check, CreditCard, QrCode, Building, Banknote } from 'lucide-react';
 import '../../styles/shop/Checkout.css';
 
 import valveImg from '../../assets/images/pivot-irrigation.png';
 import wheatImg from '../../assets/images/premium-seeds.png';
 
-const orderItems = [
-  {
-    id: 1,
-    name: "Pro-Grade Submersible Pump 2HP",
-    meta: "Industrial Grade Steel",
-    sku: "SP-200X-IND",
-    qty: 1,
-    price: 845.00,
-    image: valveImg,
-    inStock: true
-  },
-  {
-    id: 2,
-    name: "Premium Hybrid Corn Seed",
-    meta: "50 lb Bag / Treated",
-    sku: "HC-500Y-TR",
-    qty: 2,
-    price: 120.00,
-    image: wheatImg,
-    inStock: true
-  }
-];
+
 
 const Checkout = () => {
+  const { cartItems, clearCart } = useContext(CartContext);
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const stepParam = searchParams.get('step');
   const activeStep = stepParam ? parseInt(stepParam) : 1;
 
+  // Redirect if cart is empty
+  React.useEffect(() => {
+    if (cartItems.length === 0) {
+      navigate('/cart');
+    }
+  }, [cartItems, navigate]);
+
   const setActiveStep = (step) => {
     navigate(`/checkout?step=${step}`);
   };
 
   const [selectedPayment, setSelectedPayment] = useState('card');
+  const [addressData, setAddressData] = useState({
+    customerName: 'John Doe Farms',
+    customerPhone: '+1 (555) 000-0000',
+    street: '1244 Agricultural Way',
+    city: 'Fresno',
+    state: 'CA',
+    zip: '93706'
+  });
+  const [loading, setLoading] = useState(false);
 
-  // Hardcoded totals to match the different mockups
-  const totalStep1 = 525.00; 
-  const totalStep2 = 1327.63; 
-  const totalStep3 = 4752.00;
+  const handleAddressChange = (e) => {
+    setAddressData({ ...addressData, [e.target.name]: e.target.value });
+  };
+
+  const handlePayment = async () => {
+    setLoading(true);
+    try {
+      const orderData = {
+        customerName: addressData.customerName,
+        customerPhone: addressData.customerPhone,
+        shippingAddress: {
+          street: addressData.street,
+          city: addressData.city,
+          state: addressData.state,
+          zip: addressData.zip
+        },
+        items: cartItems.map(i => ({ productId: i._id, name: i.name, price: i.price, quantity: i.quantity })),
+        totalAmount: totalStep3,
+        paymentMethod: selectedPayment
+      };
+      
+      const res = await fetch('http://localhost:5001/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+      
+      if(res.ok) {
+        clearCart();
+        navigate('/order-success');
+      } else {
+        alert('Failed to process order');
+      }
+    } catch(err) {
+      console.error(err);
+      alert('Error connecting to server');
+    }
+    setLoading(false);
+  };
+
+  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const deliveryFee = 75.00; // Flat delivery fee for simplicity
+  const totalStep3 = subtotal + deliveryFee;
+  const totalStep1 = subtotal + deliveryFee;
+  const totalStep2 = subtotal + deliveryFee;
 
   return (
     <div className="checkout-page">
@@ -96,35 +134,36 @@ const Checkout = () => {
                   <div className="form-row form-row-2">
                     <div className="form-group">
                       <label>Full Name</label>
-                      <input type="text" placeholder="John Doe" />
+                      <input type="text" name="customerName" value={addressData.customerName} onChange={handleAddressChange} required />
                     </div>
                     <div className="form-group">
                       <label>Mobile Number</label>
-                      <input type="tel" placeholder="+1 (555) 000-0000" />
+                      <input type="tel" name="customerPhone" value={addressData.customerPhone} onChange={handleAddressChange} required />
                     </div>
                   </div>
 
                   <div className="form-group">
                     <label>House / Street Address</label>
-                    <input type="text" placeholder="123 Farm Lane, Barn A" />
+                    <input type="text" name="street" value={addressData.street} onChange={handleAddressChange} required />
                   </div>
 
                   <div className="form-row form-row-3">
                     <div className="form-group">
                       <label>City / Region</label>
-                      <input type="text" placeholder="Springfield" />
+                      <input type="text" name="city" value={addressData.city} onChange={handleAddressChange} required />
                     </div>
                     <div className="form-group">
                       <label>State / Province</label>
-                      <select>
+                      <select name="state" value={addressData.state} onChange={handleAddressChange} required>
                         <option>Select State</option>
-                        <option>CA</option>
-                        <option>TX</option>
+                        <option value="CA">CA</option>
+                        <option value="TX">TX</option>
+                        <option value="NY">NY</option>
                       </select>
                     </div>
                     <div className="form-group">
                       <label>Pincode / ZIP</label>
-                      <input type="text" placeholder="12345" />
+                      <input type="text" name="zip" value={addressData.zip} onChange={handleAddressChange} required />
                     </div>
                   </div>
 
@@ -155,8 +194,8 @@ const Checkout = () => {
                   </div>
                   
                   <div className="delivery-address-details">
-                    <strong>John Doe Farms</strong>
-                    <p>1244 Agricultural Way<br/>Fresno, CA 93706<br/>United States</p>
+                    <strong>{addressData.customerName}</strong>
+                    <p>{addressData.street}<br/>{addressData.city}, {addressData.state} {addressData.zip}<br/>United States<br/>{addressData.customerPhone}</p>
                   </div>
 
                   <hr className="summary-divider" />
@@ -170,23 +209,23 @@ const Checkout = () => {
                 <div className="checkout-step-container expanded mt-4">
                   <div className="order-items-header">
                     <h2 className="step-title" style={{marginBottom: 0}}>Order Items</h2>
-                    <span className="items-count-badge">2 Items</span>
+                    <span className="items-count-badge">{cartItems.length} Items</span>
                   </div>
 
                   <div className="order-items-list">
-                    {orderItems.map((item, idx) => (
+                    {cartItems.map((item, idx) => (
                       <div className="order-item-detailed" key={idx}>
                         <div className="item-img-large">
                           <img src={item.image} alt={item.name} />
                         </div>
                         <div className="item-details-large">
                           <h4>{item.name}</h4>
-                          <span className="item-sku">SKU: {item.sku}</span>
-                          {item.inStock && <span className="badge-in-stock">In Stock</span>}
+                          <span className="item-sku">SKU: {item.sku || 'N/A'}</span>
+                          <span className="badge-in-stock">In Stock</span>
                         </div>
                         <div className="item-price-large">
                           <span className="price-bold">${item.price.toFixed(2)}</span>
-                          <span className="qty-text">Qty: {item.qty}</span>
+                          <span className="qty-text">Qty: {item.quantity}</span>
                         </div>
                       </div>
                     ))}
@@ -302,33 +341,21 @@ const Checkout = () => {
               {/* Step 1 Items Summary */}
               {activeStep === 1 && (
                 <div className="summary-items">
-                  <div className="summary-item">
-                    <div className="summary-item-img">
-                      <img src={valveImg} alt="Pro-Flow Irrigation Valve V2" />
-                    </div>
-                    <div className="summary-item-details">
-                      <h4>Pro-Flow Irrigation Valve V2</h4>
-                      <span className="item-meta">Industrial Grade Steel</span>
-                      <div className="item-price-row">
-                        <span className="item-qty">Qty: 4</span>
-                        <span className="item-price">$320.00</span>
+                  {cartItems.map(item => (
+                    <div className="summary-item" key={item._id}>
+                      <div className="summary-item-img">
+                        <img src={item.image} alt={item.name} />
+                      </div>
+                      <div className="summary-item-details">
+                        <h4>{item.name}</h4>
+                        <span className="item-meta">{item.category}</span>
+                        <div className="item-price-row">
+                          <span className="item-qty">Qty: {item.quantity}</span>
+                          <span className="item-price">${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="summary-item">
-                    <div className="summary-item-img">
-                      <img src={wheatImg} alt="Drought-Resistant Wheat Seed" />
-                    </div>
-                    <div className="summary-item-details">
-                      <h4>Drought-Resistant Wheat Seed</h4>
-                      <span className="item-meta">50 lb Bulk Sack</span>
-                      <div className="item-price-row">
-                        <span className="item-qty">Qty: 2</span>
-                        <span className="item-price">$180.00</span>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               )}
 
@@ -338,15 +365,11 @@ const Checkout = () => {
                   <div className="summary-totals">
                     <div className="summary-row">
                       <span>Subtotal</span>
-                      <span>$500.00</span>
+                      <span>${subtotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
                     </div>
                     <div className="summary-row">
-                      <span>Professional Discount (10%)</span>
-                      <span className="text-success">-$50.00</span>
-                    </div>
-                    <div className="summary-row">
-                      <span>Heavy-Duty Delivery</span>
-                      <span>$75.00</span>
+                      <span>Delivery Fee</span>
+                      <span>${deliveryFee.toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -373,16 +396,12 @@ const Checkout = () => {
                 <>
                   <div className="summary-totals-step2">
                     <div className="summary-row">
-                      <span>Subtotal (3 items)</span>
-                      <span>$1,085.00</span>
+                      <span>Subtotal ({cartItems.length} items)</span>
+                      <span>${subtotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
                     </div>
                     <div className="summary-row">
-                      <span>Shipping (Heavy Freight)</span>
-                      <span>$150.00</span>
-                    </div>
-                    <div className="summary-row">
-                      <span>Estimated Tax</span>
-                      <span>$92.63</span>
+                      <span>Shipping</span>
+                      <span>${deliveryFee.toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -414,16 +433,12 @@ const Checkout = () => {
                 <>
                   <div className="summary-totals-step3">
                     <div className="summary-row">
-                      <span>Items (3)</span>
-                      <span>$4,250.00</span>
+                      <span>Items ({cartItems.length})</span>
+                      <span>${subtotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
                     </div>
                     <div className="summary-row">
-                      <span>Heavy Freight Shipping</span>
-                      <span>$150.00</span>
-                    </div>
-                    <div className="summary-row">
-                      <span>Taxes</span>
-                      <span>$352.00</span>
+                      <span>Shipping</span>
+                      <span>${deliveryFee.toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -444,8 +459,8 @@ const Checkout = () => {
                   </div>
 
                   <div className="step3-actions">
-                    <button className="btn-pay-securely" onClick={() => navigate('/order-success')}>
-                      <Lock size={16} /> PAY ${totalStep3.toLocaleString(undefined, {minimumFractionDigits: 2})} SECURELY
+                    <button className="btn-pay-securely" onClick={handlePayment} disabled={loading}>
+                      <Lock size={16} /> {loading ? 'PROCESSING...' : `PAY $${totalStep3.toLocaleString(undefined, {minimumFractionDigits: 2})} SECURELY`}
                     </button>
                   </div>
 

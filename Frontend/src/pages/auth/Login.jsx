@@ -1,10 +1,51 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 import { Eye, EyeOff, Lock } from 'lucide-react';
 import '../../styles/auth/Login.css';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const validateForm = () => {
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all fields');
+      return false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+    return true;
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (!validateForm()) return;
+
+    const res = await login(formData.email, formData.password);
+    if (res.success) {
+      if (res.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
+    } else {
+      setError(res.message);
+    }
+  };
 
   return (
     <main className="login-page">
@@ -14,15 +55,20 @@ const Login = () => {
           <h2>Welcome Back</h2>
           <p className="login-subtitle">Enter your credentials to access your account.</p>
 
-          <form className="login-form" onSubmit={e => e.preventDefault()}>
+          <form className="login-form" onSubmit={handleSubmit}>
+            {error && <div style={{ color: 'red', marginBottom: '15px' }}>{error}</div>}
+            
             <div className="input-group">
-              <input type="email" placeholder="Email Address" required />
+              <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleChange} required />
             </div>
 
             <div className="input-group">
               <input 
                 type={showPassword ? "text" : "password"} 
+                name="password"
                 placeholder="Password" 
+                value={formData.password}
+                onChange={handleChange}
                 required 
               />
               <button 

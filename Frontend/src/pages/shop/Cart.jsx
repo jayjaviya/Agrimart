@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { CartContext } from '../../context/CartContext';
 import { Heart, Trash2, Minus, Plus, Lock, Headset, ShieldCheck } from 'lucide-react';
 import '../../styles/shop/Cart.css';
 
@@ -28,22 +29,21 @@ const initialCart = [
 ];
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState(initialCart);
+  const { cartItems, updateQuantity, removeFromCart } = useContext(CartContext);
+  const navigate = useNavigate();
   
-  const handleDecrease = (id) => {
-    setCartItems(cartItems.map(item => 
-      item.id === id && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item
-    ));
+  const handleDecrease = (id, currentQty) => {
+    if (currentQty > 1) {
+      updateQuantity(id, currentQty - 1);
+    }
   };
 
-  const handleIncrease = (id) => {
-    setCartItems(cartItems.map(item => 
-      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-    ));
+  const handleIncrease = (id, currentQty) => {
+    updateQuantity(id, currentQty + 1);
   };
 
   const handleRemove = (id) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
+    removeFromCart(id);
   };
 
   const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
@@ -73,7 +73,7 @@ const Cart = () => {
               </div>
             ) : (
               cartItems.map(item => (
-                <div key={item.id} className="cart-item-card">
+                <div key={item._id} className="cart-item-card">
                   <div className="cart-item-img">
                     <img src={item.image} alt={item.name} />
                   </div>
@@ -83,7 +83,7 @@ const Cart = () => {
                       <div>
                         <span className="cart-item-category">{item.category}</span>
                         <h3 className="cart-item-title">{item.name}</h3>
-                        <span className="cart-item-sku">SKU: {item.sku}</span>
+                        <span className="cart-item-sku">SKU: {item.sku || 'N/A'}</span>
                       </div>
                       <div className="cart-item-price-wrap">
                         <span className="cart-item-price">${item.price.toFixed(2)}</span>
@@ -93,16 +93,16 @@ const Cart = () => {
 
                     <div className="cart-item-actions-row">
                       <div className="cart-quantity-selector">
-                        <button onClick={() => handleDecrease(item.id)} aria-label="Decrease"><Minus size={14} /></button>
+                        <button onClick={() => handleDecrease(item._id, item.quantity)} aria-label="Decrease"><Minus size={14} /></button>
                         <input type="number" value={item.quantity} readOnly />
-                        <button onClick={() => handleIncrease(item.id)} aria-label="Increase"><Plus size={14} /></button>
+                        <button onClick={() => handleIncrease(item._id, item.quantity)} aria-label="Increase"><Plus size={14} /></button>
                       </div>
 
                       <div className="cart-item-actions">
                         <button className="btn-action">
                           <Heart size={14} /> Move to Wishlist
                         </button>
-                        <button className="btn-action text-danger" onClick={() => handleRemove(item.id)}>
+                        <button className="btn-action text-danger" onClick={() => handleRemove(item._id)}>
                           <Trash2 size={14} /> Remove
                         </button>
                       </div>
@@ -147,7 +147,7 @@ const Cart = () => {
                 </div>
               </div>
 
-              <button className="btn-checkout">Proceed to Checkout</button>
+              <button className="btn-checkout" onClick={() => navigate('/checkout')}>Proceed to Checkout</button>
               
               <div className="continue-shopping-wrap">
                 <Link to="/products" className="link-continue">Continue Shopping</Link>
