@@ -61,7 +61,7 @@ const OrderSuccess = () => {
                     <span className="item-qty">Qty: 2</span>
                   </div>
                   <div className="success-item-price">
-                    $245.00
+                    ₹245.00
                   </div>
                 </div>
 
@@ -74,7 +74,7 @@ const OrderSuccess = () => {
                     <span className="item-qty">Qty: 1</span>
                   </div>
                   <div className="success-item-price">
-                    $335.50
+                    ₹335.50
                   </div>
                 </div>
 
@@ -82,7 +82,7 @@ const OrderSuccess = () => {
 
               <div className="success-total-row">
                 <span className="total-label">Total Amount</span>
-                <span className="total-value">$825.50</span>
+                <span className="total-value">₹825.50</span>
               </div>
             </div>
 

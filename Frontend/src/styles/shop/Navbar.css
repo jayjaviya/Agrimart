@@ -137,6 +137,63 @@
   height: 20px;
 }
 
+/* --- Nav Cart Badge (Blinkit Style) --- */
+.nav-cart-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.nav-cart-btn--active {
+  background: var(--color-primary);
+  color: var(--color-white) !important;
+}
+
+.navbar--transparent .nav-cart-btn--active {
+  background: var(--color-primary);
+}
+
+.nav-cart-btn:not(.nav-cart-btn--active) {
+  width: 36px;
+  height: 36px;
+  justify-content: center;
+  border-radius: var(--radius-full);
+}
+
+.nav-cart-btn:not(.nav-cart-btn--active):hover {
+  background: rgba(26, 60, 52, 0.08);
+}
+
+.navbar--transparent .nav-cart-btn:not(.nav-cart-btn--active):hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.navbar--transparent .nav-cart-btn:not(.nav-cart-btn--active) {
+  color: var(--color-white);
+}
+
+.nav-cart-badge {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.nav-cart-count {
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.nav-cart-total {
+  font-size: 0.65rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
 /* --- Nav Auth Buttons --- */
 .auth-buttons {
   display: flex;

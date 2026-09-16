@@ -110,7 +110,7 @@ const OrderTrack = () => {
                     <span className="item-sku">SKU: IR-PMP-500-X</span>
                     <div className="item-qty-price">
                       <span className="qty">Qty: 1</span>
-                      <span className="price">$1,250.00</span>
+                      <span className="price">₹1,250.00</span>
                     </div>
                   </div>
                 </div>
@@ -124,7 +124,7 @@ const OrderTrack = () => {
                     <span className="item-sku">SKU: IR-PIP-100-RP</span>
                     <div className="item-qty-price">
                       <span className="qty">Qty: 2</span>
-                      <span className="price">$480.00</span>
+                      <span className="price">₹480.00</span>
                     </div>
                   </div>
                 </div>
@@ -144,21 +144,21 @@ const OrderTrack = () => {
               <div className="track-summary-rows">
                 <div className="summary-row">
                   <span>Subtotal</span>
-                  <span>$1,730.00</span>
+                  <span>₹1,730.00</span>
                 </div>
                 <div className="summary-row">
                   <span>Shipping (Freight)</span>
-                  <span>$125.00</span>
+                  <span>₹125.00</span>
                 </div>
                 <div className="summary-row">
                   <span>Tax (Calculated)</span>
-                  <span>$148.40</span>
+                  <span>₹148.40</span>
                 </div>
               </div>
               
               <div className="summary-total-row">
                 <span>Total</span>
-                <span>$2,003.40</span>
+                <span>₹2,003.40</span>
               </div>
             </div>
 

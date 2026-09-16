@@ -7,7 +7,15 @@ import '../../styles/shop/Checkout.css';
 import valveImg from '../../assets/images/pivot-irrigation.png';
 import wheatImg from '../../assets/images/premium-seeds.png';
 
-
+const INDIAN_STATES = [
+  "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", 
+  "Bihar", "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli and Daman and Diu", 
+  "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", 
+  "Jharkhand", "Karnataka", "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", 
+  "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Puducherry", 
+  "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", 
+  "Uttar Pradesh", "Uttarakhand", "West Bengal"
+];
 
 const Checkout = () => {
   const { cartItems, clearCart } = useContext(CartContext);
@@ -30,12 +38,12 @@ const Checkout = () => {
 
   const [selectedPayment, setSelectedPayment] = useState('card');
   const [addressData, setAddressData] = useState({
-    customerName: 'John Doe Farms',
-    customerPhone: '+1 (555) 000-0000',
-    street: '1244 Agricultural Way',
-    city: 'Fresno',
-    state: 'CA',
-    zip: '93706'
+    customerName: '',
+    customerPhone: '',
+    street: '',
+    city: '',
+    state: '',
+    zip: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -134,36 +142,36 @@ const Checkout = () => {
                   <div className="form-row form-row-2">
                     <div className="form-group">
                       <label>Full Name</label>
-                      <input type="text" name="customerName" value={addressData.customerName} onChange={handleAddressChange} required />
+                      <input type="text" name="customerName" value={addressData.customerName} onChange={handleAddressChange} placeholder="Enter your full name" minLength={2} pattern="^[A-Za-z\s]+$" title="Name should only contain letters and spaces" required />
                     </div>
                     <div className="form-group">
                       <label>Mobile Number</label>
-                      <input type="tel" name="customerPhone" value={addressData.customerPhone} onChange={handleAddressChange} required />
+                      <input type="tel" name="customerPhone" value={addressData.customerPhone} onChange={handleAddressChange} placeholder="10-digit mobile number" pattern="^[0-9]{10}$" minLength={10} maxLength={10} title="Please enter a valid 10-digit mobile number" required />
                     </div>
                   </div>
 
                   <div className="form-group">
                     <label>House / Street Address</label>
-                    <input type="text" name="street" value={addressData.street} onChange={handleAddressChange} required />
+                    <input type="text" name="street" value={addressData.street} onChange={handleAddressChange} placeholder="House no, Building, Street area" required />
                   </div>
 
                   <div className="form-row form-row-3">
                     <div className="form-group">
                       <label>City / Region</label>
-                      <input type="text" name="city" value={addressData.city} onChange={handleAddressChange} required />
+                      <input type="text" name="city" value={addressData.city} onChange={handleAddressChange} placeholder="Enter city" required />
                     </div>
                     <div className="form-group">
                       <label>State / Province</label>
                       <select name="state" value={addressData.state} onChange={handleAddressChange} required>
-                        <option>Select State</option>
-                        <option value="CA">CA</option>
-                        <option value="TX">TX</option>
-                        <option value="NY">NY</option>
+                        <option value="" disabled>Select State</option>
+                        {INDIAN_STATES.map((state) => (
+                          <option key={state} value={state}>{state}</option>
+                        ))}
                       </select>
                     </div>
                     <div className="form-group">
                       <label>Pincode / ZIP</label>
-                      <input type="text" name="zip" value={addressData.zip} onChange={handleAddressChange} required />
+                      <input type="text" name="zip" value={addressData.zip} onChange={handleAddressChange} placeholder="6-digit PIN" pattern="^[0-9]{6}$" minLength={6} maxLength={6} title="Please enter a valid 6-digit PIN code" required />
                     </div>
                   </div>
 
@@ -224,7 +232,7 @@ const Checkout = () => {
                           <span className="badge-in-stock">In Stock</span>
                         </div>
                         <div className="item-price-large">
-                          <span className="price-bold">${item.price.toFixed(2)}</span>
+                          <span className="price-bold">₹{item.price.toFixed(2)}</span>
                           <span className="qty-text">Qty: {item.quantity}</span>
                         </div>
                       </div>
@@ -351,7 +359,7 @@ const Checkout = () => {
                         <span className="item-meta">{item.category}</span>
                         <div className="item-price-row">
                           <span className="item-qty">Qty: {item.quantity}</span>
-                          <span className="item-price">${(item.price * item.quantity).toFixed(2)}</span>
+                          <span className="item-price">₹{(item.price * item.quantity).toFixed(2)}</span>
                         </div>
                       </div>
                     </div>
@@ -365,17 +373,17 @@ const Checkout = () => {
                   <div className="summary-totals">
                     <div className="summary-row">
                       <span>Subtotal</span>
-                      <span>${subtotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                      <span>₹{subtotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
                     </div>
                     <div className="summary-row">
                       <span>Delivery Fee</span>
-                      <span>${deliveryFee.toFixed(2)}</span>
+                      <span>₹{deliveryFee.toFixed(2)}</span>
                     </div>
                   </div>
 
                   <div className="summary-total-final">
                     <span>Total</span>
-                    <span className="total-price">${totalStep1.toFixed(2)}</span>
+                    <span className="total-price">₹{totalStep1.toFixed(2)}</span>
                   </div>
 
                   <div className="checkout-trust-badges">
@@ -397,17 +405,17 @@ const Checkout = () => {
                   <div className="summary-totals-step2">
                     <div className="summary-row">
                       <span>Subtotal ({cartItems.length} items)</span>
-                      <span>${subtotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                      <span>₹{subtotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
                     </div>
                     <div className="summary-row">
                       <span>Shipping</span>
-                      <span>${deliveryFee.toFixed(2)}</span>
+                      <span>₹{deliveryFee.toFixed(2)}</span>
                     </div>
                   </div>
 
                   <div className="summary-total-final">
                     <span>Total</span>
-                    <span className="total-price">${totalStep2.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                    <span className="total-price">₹{totalStep2.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
                   </div>
 
                   <div className="step2-actions">
@@ -434,17 +442,17 @@ const Checkout = () => {
                   <div className="summary-totals-step3">
                     <div className="summary-row">
                       <span>Items ({cartItems.length})</span>
-                      <span>${subtotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                      <span>₹{subtotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
                     </div>
                     <div className="summary-row">
                       <span>Shipping</span>
-                      <span>${deliveryFee.toFixed(2)}</span>
+                      <span>₹{deliveryFee.toFixed(2)}</span>
                     </div>
                   </div>
 
                   <div className="summary-total-final mb-4">
                     <span>Total</span>
-                    <span className="total-price">${totalStep3.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                    <span className="total-price">₹{totalStep3.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
                   </div>
 
                   <div className="delivery-address-summary-box">
@@ -460,7 +468,7 @@ const Checkout = () => {
 
                   <div className="step3-actions">
                     <button className="btn-pay-securely" onClick={handlePayment} disabled={loading}>
-                      <Lock size={16} /> {loading ? 'PROCESSING...' : `PAY $${totalStep3.toLocaleString(undefined, {minimumFractionDigits: 2})} SECURELY`}
+                      <Lock size={16} /> {loading ? 'PROCESSING...' : `PAY ₹${totalStep3.toLocaleString(undefined, {minimumFractionDigits: 2})} SECURELY`}
                     </button>
                   </div>
 

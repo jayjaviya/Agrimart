@@ -1,8 +1,63 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import { Package, HelpCircle, Truck, ArrowLeftRight, Phone, MessageCircle, Mail } from 'lucide-react';
+import { AuthContext } from '../../context/AuthContext';
 import '../../styles/shop/Contact.css';
 
 const Contact = () => {
+  const { user } = useContext(AuthContext);
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    contactNumber: '',
+    issueType: '',
+    orderId: '',
+    description: ''
+  });
+  const [status, setStatus] = useState({ type: '', message: '' });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setStatus({ type: '', message: '' });
+
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const userObj = JSON.parse(localStorage.getItem('agrimart_user') || '{}');
+      const token = userObj.token;
+      
+      const res = await fetch(`${API_URL}/api/tickets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ ...formData, userId: user?._id })
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to submit request');
+      }
+
+      setStatus({ type: 'success', message: 'Your support request has been submitted successfully. We will get back to you soon.' });
+      setFormData({
+        name: user?.name || '',
+        contactNumber: '',
+        issueType: '',
+        orderId: '',
+        description: ''
+      });
+    } catch (error) {
+      console.error(error);
+      setStatus({ type: 'error', message: 'Something went wrong. Please try again later.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="contact-page">
       <div className="contact-container">
@@ -74,15 +129,20 @@ const Contact = () => {
             <div className="form-container">
               <h2>Submit a Support Request</h2>
               
-              <form className="support-form" onSubmit={e => e.preventDefault()}>
+              {status.message && (
+                <div className={`form-status ${status.type}`}>
+                  {status.message}
+                </div>
+              )}
+              <form className="support-form" onSubmit={handleSubmit}>
                 <div className="form-row">
                   <div className="form-group">
                     <label>FULL NAME</label>
-                    <input type="text" placeholder="e.g. John Deere" />
+                    <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="e.g. John Deere" required />
                   </div>
                   <div className="form-group">
                     <label>CONTACT NUMBER</label>
-                    <input type="text" placeholder="+1 (555) 000-0000" />
+                    <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} placeholder="+1 (555) 000-0000" required />
                   </div>
                 </div>
 
@@ -90,7 +150,7 @@ const Contact = () => {
                   <div className="form-group">
                     <label>ISSUE TYPE</label>
                     <div className="select-wrapper">
-                      <select defaultValue="">
+                      <select name="issueType" value={formData.issueType} onChange={handleChange} required>
                         <option value="" disabled>Select an issue...</option>
                         <option value="order">Order Inquiry</option>
                         <option value="product">Product Question</option>
@@ -102,18 +162,18 @@ const Contact = () => {
                   </div>
                   <div className="form-group">
                     <label>ORDER ID (OPTIONAL)</label>
-                    <input type="text" placeholder="e.g. AG-12345" />
+                    <input type="text" name="orderId" value={formData.orderId} onChange={handleChange} placeholder="e.g. AG-12345" />
                   </div>
                 </div>
 
                 <div className="form-group">
                   <label>DESCRIPTION</label>
-                  <textarea rows={5} placeholder="Please describe your issue in detail..."></textarea>
+                  <textarea rows={5} name="description" value={formData.description} onChange={handleChange} placeholder="Please describe your issue in detail..." required></textarea>
                 </div>
 
                 <div className="form-submit-wrap">
-                  <button type="submit" className="btn-submit-request">
-                    Submit Request &rarr;
+                  <button type="submit" className="btn-submit-request" disabled={loading}>
+                    {loading ? 'Submitting...' : 'Submit Request \u2192'}
                   </button>
                 </div>
               </form>

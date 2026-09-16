@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { CartContext } from '../../context/CartContext';
-import { Star, Truck, Heart, ChevronRight, Minus, Plus, Droplets, ArrowUpCircle } from 'lucide-react';
+import AddToCartButton from '../../components/shop/AddToCartButton';
+import { Star, Truck, ChevronRight } from 'lucide-react';
 import '../../styles/shop/ProductDetails.css';
 
 const ProductDetails = () => {
@@ -10,7 +11,6 @@ const ProductDetails = () => {
   const { addToCart } = useContext(CartContext);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
 
   useEffect(() => {
@@ -41,15 +41,6 @@ const ProductDetails = () => {
   }
 
   const images = [product.image]; // we only have 1 image per product right now in db
-
-  const handleDecrease = () => {
-    if (quantity > 1) setQuantity(quantity - 1);
-  };
-
-  const handleIncrease = () => {
-    // optional: limit by stockQuantity
-    if (quantity < (product.stockQuantity || 100)) setQuantity(quantity + 1);
-  };
 
   return (
     <main className="product-details-page">
@@ -99,7 +90,7 @@ const ProductDetails = () => {
             </div>
 
             <div className="pd-price-row">
-              <span className="pd-price">${product.price.toFixed(2)}</span>
+              <span className="pd-price">₹{product.price.toFixed(2)}</span>
             </div>
 
             <p className="pd-description">
@@ -115,27 +106,8 @@ const ProductDetails = () => {
             <hr className="pd-divider" />
 
             <div className="pd-actions-area">
-              <div className="pd-quantity-row">
-                <div className="pd-quantity-selector">
-                  <button onClick={handleDecrease}><Minus size={16} /></button>
-                  <input type="number" value={quantity} readOnly />
-                  <button onClick={handleIncrease}><Plus size={16} /></button>
-                </div>
-                <span className="pd-unit-text">Units ({product.stockQuantity || 0} available)</span>
-              </div>
-
-              <div className="pd-buttons-row">
-                <button 
-                  className="pd-btn-add"
-                  onClick={() => {
-                    addToCart(product, quantity);
-                    navigate('/cart');
-                  }}
-                >
-                  ADD TO CART
-                </button>
-                <button className="pd-btn pd-btn-secondary" onClick={() => navigate('/checkout')}>Buy Now</button>
-                <button className="pd-btn pd-btn-icon"><Heart size={20} /></button>
+              <div className="pd-buttons-row" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <AddToCartButton product={product} variant="large" />
               </div>
             </div>
 

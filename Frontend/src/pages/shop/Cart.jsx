@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CartContext } from '../../context/CartContext';
-import { Heart, Trash2, Minus, Plus, Lock, Headset, ShieldCheck } from 'lucide-react';
+import { Trash2, Minus, Plus, Lock, Headset, ShieldCheck } from 'lucide-react';
 import '../../styles/shop/Cart.css';
 
 import pumpImg from '../../assets/images/tools-equipment.png';
@@ -86,8 +86,7 @@ const Cart = () => {
                         <span className="cart-item-sku">SKU: {item.sku || 'N/A'}</span>
                       </div>
                       <div className="cart-item-price-wrap">
-                        <span className="cart-item-price">${item.price.toFixed(2)}</span>
-                        <span className="cart-item-unit">/ unit</span>
+                        <span className="cart-item-price">₹{item.price.toFixed(2)}</span>
                       </div>
                     </div>
 
@@ -99,9 +98,6 @@ const Cart = () => {
                       </div>
 
                       <div className="cart-item-actions">
-                        <button className="btn-action">
-                          <Heart size={14} /> Move to Wishlist
-                        </button>
                         <button className="btn-action text-danger" onClick={() => handleRemove(item._id)}>
                           <Trash2 size={14} /> Remove
                         </button>
@@ -121,22 +117,22 @@ const Cart = () => {
               
               <div className="summary-row">
                 <span>Subtotal ({cartItems.length} items)</span>
-                <span>${subtotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                <span>₹{subtotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
               </div>
               <div className="summary-row">
                 <span>Professional Discount</span>
-                <span className="text-success">${Math.abs(professionalDiscount).toFixed(2).replace(/^/, '-$')}</span>
+                <span className="text-success">₹{Math.abs(professionalDiscount).toFixed(2).replace(/^/, '-₹')}</span>
               </div>
               <div className="summary-row">
                 <span>Heavy-Duty Delivery</span>
-                <span>${delivery.toFixed(2)}</span>
+                <span>₹{delivery.toFixed(2)}</span>
               </div>
               
               <hr />
 
               <div className="summary-total-row">
                 <span>Total</span>
-                <span className="total-price">${total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                <span className="total-price">₹{total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
               </div>
 
               <div className="promo-code-section">

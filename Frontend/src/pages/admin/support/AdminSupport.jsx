@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from '../../../components/admin/AdminLayout';
 import { 
@@ -15,38 +15,49 @@ import {
 import '../../../styles/admin/support/AdminSupport.css';
 
 const AdminSupport = () => {
-  const tickets = [
-    {
-      id: '#TKT-8842',
-      customerInitials: 'VO',
-      customerName: 'Valley Orchards',
-      issueType: 'Order Issue',
-      orderId: '#AGM-9082',
-      date: 'Oct 12, 2023',
-      priority: 'High',
-      status: 'Open'
-    },
-    {
-      id: '#TKT-8841',
-      customerInitials: 'SF',
-      customerName: 'Skyline Farms LLC',
-      issueType: 'Delivery Issue',
-      orderId: '#AGM-8912',
-      date: 'Oct 11, 2023',
-      priority: 'Medium',
-      status: 'In Progress'
-    },
-    {
-      id: '#TKT-8840',
-      customerInitials: 'GG',
-      customerName: 'Golden Grain Mills',
-      issueType: 'Product Question',
-      orderId: '#AGM-8850',
-      date: 'Oct 10, 2023',
-      priority: 'Low',
-      status: 'Resolved'
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTickets();
+  }, []);
+
+  const fetchTickets = async () => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const userObj = JSON.parse(localStorage.getItem('agrimart_user') || '{}');
+      const token = userObj.token;
+      const res = await fetch(`${API_URL}/api/tickets`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTickets(data);
+      }
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  const openTickets = tickets.filter(t => t.status === 'Open').length;
+  const inProgressTickets = tickets.filter(t => t.status === 'In Progress').length;
+  const resolvedTickets = tickets.filter(t => t.status === 'Resolved').length;
+  // We don't have a priority field yet, so setting high priority to 0 for now
+  const highPriorityTickets = 0;
 
   return (
     <AdminLayout 
@@ -72,7 +83,6 @@ const AdminSupport = () => {
           </button>
         </div>
 
-        {/* KPI Cards */}
         <div className="support-kpi-row">
           <div className="kpi-card border-green">
             <div className="kpi-header">
@@ -80,8 +90,8 @@ const AdminSupport = () => {
               <Inbox size={18} className="kpi-icon" />
             </div>
             <div className="kpi-value-row">
-              <span className="kpi-value">24</span>
-              <span className="kpi-trend trend-up">↑ 12%</span>
+              <span className="kpi-value">{openTickets}</span>
+              <span className="kpi-trend trend-neutral">Total</span>
             </div>
           </div>
           
@@ -91,7 +101,7 @@ const AdminSupport = () => {
               <RefreshCw size={18} className="kpi-icon" />
             </div>
             <div className="kpi-value-row">
-              <span className="kpi-value">12</span>
+              <span className="kpi-value">{inProgressTickets}</span>
               <span className="kpi-trend trend-neutral">Active</span>
             </div>
           </div>
@@ -102,8 +112,8 @@ const AdminSupport = () => {
               <CheckCircle size={18} className="kpi-icon" />
             </div>
             <div className="kpi-value-row">
-              <span className="kpi-value">156</span>
-              <span className="kpi-trend trend-neutral">↑ 4%</span>
+              <span className="kpi-value">{resolvedTickets}</span>
+              <span className="kpi-trend trend-neutral">Total</span>
             </div>
           </div>
 
@@ -113,7 +123,7 @@ const AdminSupport = () => {
               <AlertTriangle size={18} className="kpi-icon-danger" />
             </div>
             <div className="kpi-value-row">
-              <span className="kpi-value value-danger">5</span>
+              <span className="kpi-value value-danger">{highPriorityTickets}</span>
               <span className="kpi-trend trend-danger">Requires Attention</span>
             </div>
           </div>
@@ -170,34 +180,46 @@ const AdminSupport = () => {
                 </tr>
               </thead>
               <tbody>
-                {tickets.map((ticket, idx) => (
+                {loading ? (
+                  <tr>
+                    <td colSpan="8" style={{textAlign: 'center', padding: '2rem'}}>Loading tickets...</td>
+                  </tr>
+                ) : tickets.length === 0 ? (
+                  <tr>
+                    <td colSpan="8" style={{textAlign: 'center', padding: '2rem'}}>No support tickets found.</td>
+                  </tr>
+                ) : tickets.map((ticket, idx) => (
                   <tr key={idx}>
                     <td className="ticket-id-cell">
-                      <Link to={`/admin/support/${ticket.id.replace('#', '')}`} style={{color: 'inherit', textDecoration: 'none'}}>
-                        {ticket.id}
+                      <Link to={`/admin/support/${ticket._id}`} style={{color: 'inherit', textDecoration: 'none'}}>
+                        #{ticket.ticketId}
                       </Link>
                     </td>
                     <td>
                       <div className="customer-info-cell">
                         <div className="customer-avatar-box">
-                          {ticket.customerInitials}
+                          {getInitials(ticket.name)}
                         </div>
                         <div className="customer-details">
-                          <span className="customer-name">{ticket.customerName}</span>
+                          <span className="customer-name">{ticket.name}</span>
                         </div>
                       </div>
                     </td>
-                    <td className="issue-type-cell">{ticket.issueType}</td>
+                    <td className="issue-type-cell" style={{textTransform: 'capitalize'}}>{ticket.issueType}</td>
                     <td>
-                      <Link to={`/admin/orders/${ticket.orderId.replace('#', '')}`} className="order-id-link">
-                        {ticket.orderId}
-                      </Link>
+                      {ticket.orderId ? (
+                        <Link to={`/admin/orders/${ticket.orderId}`} className="order-id-link">
+                          {ticket.orderId}
+                        </Link>
+                      ) : (
+                        <span style={{color: '#94a3b8'}}>N/A</span>
+                      )}
                     </td>
-                    <td className="date-cell">{ticket.date}</td>
+                    <td className="date-cell">{formatDate(ticket.createdAt)}</td>
                     <td>
-                      <span className={`priority-badge priority-${ticket.priority.toLowerCase()}`}>
+                      <span className={`priority-badge priority-medium`}>
                         <span className="priority-dot"></span>
-                        {ticket.priority}
+                        Medium
                       </span>
                     </td>
                     <td>
@@ -206,7 +228,7 @@ const AdminSupport = () => {
                       </span>
                     </td>
                     <td style={{textAlign: 'center'}}>
-                      <Link to={`/admin/support/${ticket.id.replace('#', '')}`} className="btn-icon-action">
+                      <Link to={`/admin/support/${ticket._id}`} className="btn-icon-action">
                         <Eye size={18} />
                       </Link>
                     </td>

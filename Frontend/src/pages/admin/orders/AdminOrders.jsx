@@ -104,7 +104,7 @@ const AdminOrders = () => {
                       </div>
                     </td>
                     <td className="products-cell" title={getProductsSummary(order.items)}>{getProductsSummary(order.items)}</td>
-                    <td className="total-cell">${order.totalAmount?.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                    <td className="total-cell">₹{order.totalAmount?.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                     <td>
                       <span className="payment-badge payment-paid">
                         Paid

@@ -163,6 +163,20 @@
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--color-black);
+  padding: 0;
+  margin: 0;
+  line-height: 30px;
+  box-sizing: border-box;
+}
+
+/* Hide spin buttons for number input */
+.cart-quantity-selector input::-webkit-outer-spin-button,
+.cart-quantity-selector input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.cart-quantity-selector input[type=number] {
+  -moz-appearance: textfield;
 }
 
 .cart-item-actions {

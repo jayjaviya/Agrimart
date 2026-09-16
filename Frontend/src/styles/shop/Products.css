@@ -192,7 +192,7 @@
 
 .prod-card-img-wrap {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  height: 220px;
   background: #f9f9f9;
   padding: var(--space-lg);
   display: flex;

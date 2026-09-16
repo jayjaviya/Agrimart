@@ -12,6 +12,8 @@ import Cart from './pages/shop/Cart';
 import Checkout from './pages/shop/Checkout';
 import OrderSuccess from './pages/shop/OrderSuccess';
 import OrderTrack from './pages/shop/OrderTrack';
+import MyOrders from './pages/shop/MyOrders';
+import OrderDetails from './pages/shop/OrderDetails';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminOrders from './pages/admin/orders/AdminOrders';
@@ -19,16 +21,11 @@ import AdminOrderDetails from './pages/admin/orders/AdminOrderDetails';
 import AdminProducts from './pages/admin/products/AdminProducts';
 import AdminAddProduct from './pages/admin/products/AdminAddProduct';
 import AdminEditProduct from './pages/admin/products/AdminEditProduct';
-import AdminInventory from './pages/admin/inventory/AdminInventory';
-import AdminCustomers from './pages/admin/customers/AdminCustomers';
-import AdminCustomerDetails from './pages/admin/customers/AdminCustomerDetails';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminSupport from './pages/admin/support/AdminSupport';
 import AdminTicketDetails from './pages/admin/support/AdminTicketDetails';
-import AdminReports from './pages/admin/reports/AdminReports';
-import AdminSettings from './pages/admin/settings/AdminSettings';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 
@@ -72,6 +69,8 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/order-track" element={<OrderTrack />} />
+          <Route path="/orders" element={<MyOrders />} />
+          <Route path="/orders/:id" element={<OrderDetails />} />
           
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
@@ -81,13 +80,8 @@ function App() {
           <Route path="/admin/products" element={<ProtectedRoute adminOnly={true}><AdminProducts /></ProtectedRoute>} />
           <Route path="/admin/products/add" element={<ProtectedRoute adminOnly={true}><AdminAddProduct /></ProtectedRoute>} />
           <Route path="/admin/products/edit/:id" element={<ProtectedRoute adminOnly={true}><AdminEditProduct /></ProtectedRoute>} />
-          <Route path="/admin/inventory" element={<ProtectedRoute adminOnly={true}><AdminInventory /></ProtectedRoute>} />
-          <Route path="/admin/customers" element={<ProtectedRoute adminOnly={true}><AdminCustomers /></ProtectedRoute>} />
-          <Route path="/admin/customers/:id" element={<ProtectedRoute adminOnly={true}><AdminCustomerDetails /></ProtectedRoute>} />
           <Route path="/admin/support" element={<ProtectedRoute adminOnly={true}><AdminSupport /></ProtectedRoute>} />
           <Route path="/admin/support/:id" element={<ProtectedRoute adminOnly={true}><AdminTicketDetails /></ProtectedRoute>} />
-          <Route path="/admin/reports" element={<ProtectedRoute adminOnly={true}><AdminReports /></ProtectedRoute>} />
-          <Route path="/admin/settings" element={<ProtectedRoute adminOnly={true}><AdminSettings /></ProtectedRoute>} />
         </Routes>
         {showNavFooter && <Footer />}
       </CartProvider>

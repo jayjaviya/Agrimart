@@ -188,7 +188,7 @@ const AdminProducts = () => {
                         <td>
                           <span className="category-badge" style={{ textTransform: 'uppercase' }}>{product.category}</span>
                         </td>
-                        <td className="price-cell">${product.price?.toFixed(2)}</td>
+                        <td className="price-cell">₹{product.price?.toFixed(2)}</td>
                         <td>
                           <div className="stock-level-cell">
                             <span className={`stock-text ${stockStatus}`}>

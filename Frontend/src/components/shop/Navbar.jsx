@@ -1,7 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { Search, ShoppingCart, User } from 'lucide-react';
+import { CartContext } from '../../context/CartContext';
+import { ShoppingCart, User } from 'lucide-react';
 import whiteLogo from '../../assets/images/logo/whiteThemeLogo.png';
 import blackLogo from '../../assets/images/logo/blackThemeLogo.png';
 import '../../styles/shop/Navbar.css';
@@ -12,6 +13,7 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
   const { user, logout } = useContext(AuthContext);
+  const { cartCount, cartTotal } = useContext(CartContext);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,8 +67,6 @@ const Navbar = () => {
                   <span>{user.phone || user.email}</span>
                 </div>
                 <Link to="/orders" className="nav-dropdown-item">My Orders</Link>
-                <Link to="/addresses" className="nav-dropdown-item">Saved Addresses</Link>
-                <Link to="/wishlist" className="nav-dropdown-item">Wishlist & Favorites</Link>
                 <Link to="/support" className="nav-dropdown-item">Help Center</Link>
                 <div className="nav-dropdown-divider"></div>
                 <button onClick={logout} className="nav-dropdown-item nav-dropdown-logout">
@@ -81,8 +81,13 @@ const Navbar = () => {
             </div>
           )}
 
-          <Link to="/cart" className="nav-icon" aria-label="Cart">
-            <ShoppingCart />
+          <Link to="/cart" className={`nav-cart-btn ${cartCount > 0 ? 'nav-cart-btn--active' : ''}`} aria-label="Cart">
+            <ShoppingCart size={20} />
+            {cartCount > 0 && (
+              <span className="nav-cart-badge">
+                <span className="nav-cart-count">{cartCount} {cartCount === 1 ? 'item' : 'items'}</span>
+              </span>
+            )}
           </Link>
         </div>
 
@@ -104,7 +109,14 @@ const Navbar = () => {
         <Link to="/products" className="nav-link" onClick={toggleMenu}>Products</Link>
         <Link to="/contact" className="nav-link" onClick={toggleMenu}>Contact</Link>
         <div className="nav-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
-          <Link to="/cart" className="nav-icon" aria-label="Cart"><ShoppingCart /></Link>
+          <Link to="/cart" className={`nav-cart-btn ${cartCount > 0 ? 'nav-cart-btn--active' : ''}`} aria-label="Cart">
+            <ShoppingCart size={20} />
+            {cartCount > 0 && (
+              <span className="nav-cart-badge">
+                <span className="nav-cart-count">{cartCount} {cartCount === 1 ? 'item' : 'items'}</span>
+              </span>
+            )}
+          </Link>
           
           {user ? (
             <div style={{ width: '100%', marginTop: '10px', background: 'rgba(0,0,0,0.03)', padding: '15px', borderRadius: '8px' }}>
@@ -113,8 +125,6 @@ const Navbar = () => {
                 <span style={{ fontSize: '0.85rem', color: '#666' }}>{user.phone || user.email}</span>
               </div>
               <Link to="/orders" className="nav-link" onClick={toggleMenu} style={{ display: 'block', marginBottom: '10px' }}>My Orders</Link>
-              <Link to="/addresses" className="nav-link" onClick={toggleMenu} style={{ display: 'block', marginBottom: '10px' }}>Saved Addresses</Link>
-              <Link to="/wishlist" className="nav-link" onClick={toggleMenu} style={{ display: 'block', marginBottom: '10px' }}>Wishlist & Favorites</Link>
               <Link to="/support" className="nav-link" onClick={toggleMenu} style={{ display: 'block', marginBottom: '15px' }}>Help Center</Link>
               <button 
                 onClick={() => { logout(); toggleMenu(); }} 

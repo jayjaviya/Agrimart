@@ -1,5 +1,5 @@
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../../components/admin/AdminLayout';
 import { 
   Search, 
@@ -22,12 +22,77 @@ import '../../../styles/admin/support/AdminTicketDetails.css';
 
 const AdminTicketDetails = () => {
   const { id } = useParams();
-  const ticketId = id ? `#${id}` : '#TKT-8842';
+  const navigate = useNavigate();
+  const [ticket, setTicket] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTicket();
+  }, [id]);
+
+  const fetchTicket = async () => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const userObj = JSON.parse(localStorage.getItem('agrimart_user') || '{}');
+      const token = userObj.token;
+      const res = await fetch(`${API_URL}/api/tickets/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTicket(data);
+      } else {
+        navigate('/admin/support');
+      }
+    } catch (error) {
+      console.error('Error fetching ticket:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (e) => {
+    const newStatus = e.target.value;
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const userObj = JSON.parse(localStorage.getItem('agrimart_user') || '{}');
+      const token = userObj.token;
+      const res = await fetch(`${API_URL}/api/tickets/${id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        const updatedTicket = await res.json();
+        setTicket(updatedTicket);
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
+
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  if (loading) return <AdminLayout><div style={{padding: '2rem'}}>Loading...</div></AdminLayout>;
+  if (!ticket) return <AdminLayout><div style={{padding: '2rem'}}>Ticket not found.</div></AdminLayout>;
 
   return (
     <AdminLayout 
-      headerTitle={<><span style={{color: '#64748b'}}>Support &gt; </span>Ticket {ticketId}</>}
-      headerSubtitle={`Created: Oct 24, 2023 10:45 AM • ID: ${ticketId}`}
+      headerTitle={<><span style={{color: '#64748b'}}>Support &gt; </span>Ticket #{ticket.ticketId}</>}
+      headerSubtitle={`Created: ${formatDate(ticket.createdAt)} • ID: #${ticket.ticketId}`}
     >
       <div className="admin-ticket-details-page">
         
@@ -38,10 +103,10 @@ const AdminTicketDetails = () => {
             <input type="text" placeholder="Search orders, tickets, products..." style={{width: '100%', padding: '10px 12px 10px 36px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.9rem', outline: 'none'}} />
           </div>
           <div className="ticket-page-actions">
-            <select className="action-select status-select">
-              <option>Status: Open</option>
-              <option>Status: In Progress</option>
-              <option>Status: Resolved</option>
+            <select className="action-select status-select" value={ticket.status} onChange={handleStatusChange}>
+              <option value="Open">Status: Open</option>
+              <option value="In Progress">Status: In Progress</option>
+              <option value="Resolved">Status: Resolved</option>
             </select>
             <select className="action-select priority-select">
               <option>Priority: High</option>
@@ -63,33 +128,30 @@ const AdminTicketDetails = () => {
               </div>
               <div className="panel-content">
                 <p className="issue-text">
-                  "We received the recent shipment of premium soil amendments (Order #AGM-9082), but three of the pallets were damaged during transit. The packaging is torn and the contents are spilling. We need an expedited replacement for the damaged units as this is holding up our planting schedule. Please advise on the return process and when we can expect the replacements."
+                  {ticket.description}
                 </p>
               </div>
             </div>
 
             {/* Related Order */}
-            <div className="ticket-panel">
-              <div className="panel-header">
-                <h3>Related Order</h3>
-                <Link to="/admin/orders/AGM-9082" className="panel-link">View Full Order <ArrowRight size={14} /></Link>
-              </div>
-              <div className="panel-content">
-                <div className="related-order-card">
-                  <div className="order-icon-box">
-                    <Truck size={24} />
-                  </div>
-                  <div className="order-info">
-                    <h4>#AGM-9082</h4>
-                    <p>Premium Soil Amendments (x12 Pallets)</p>
-                  </div>
-                  <div className="order-meta">
-                    <div className="order-price">$4,250.00</div>
-                    <span className="status-badge status-delivered-issues">DELIVERED (WITH ISSUES)</span>
+            {ticket.orderId && (
+              <div className="ticket-panel">
+                <div className="panel-header">
+                  <h3>Related Order</h3>
+                  <Link to={`/admin/orders/${ticket.orderId}`} className="panel-link">View Order <ArrowRight size={14} /></Link>
+                </div>
+                <div className="panel-content">
+                  <div className="related-order-card">
+                    <div className="order-icon-box">
+                      <Truck size={24} />
+                    </div>
+                    <div className="order-info">
+                      <h4>#{ticket.orderId}</h4>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Conversation History */}
             <div className="ticket-panel">
@@ -165,31 +227,16 @@ const AdminTicketDetails = () => {
               </div>
               <div className="panel-content profile-content">
                 <div className="mini-profile">
-                  <div className="mini-avatar">VO</div>
+                  <div className="mini-avatar">{getInitials(ticket.name)}</div>
                   <div className="mini-info">
-                    <h4>Valley Orchards</h4>
-                    <Link to="/admin/customers/CUS-8104" className="profile-link">View CRM Profile</Link>
+                    <h4>{ticket.name}</h4>
                   </div>
                 </div>
                 <div className="profile-contact">
                   <h5>Contact</h5>
                   <div className="contact-item">
-                    <Mail size={14} />
-                    <span>j.smith@valleyorchards.co</span>
-                  </div>
-                  <div className="contact-item">
                     <Phone size={14} />
-                    <span>+1 (555) 019-2834</span>
-                  </div>
-                </div>
-                <div className="profile-stats">
-                  <div className="stat-box">
-                    <span className="stat-label">Lifetime Value</span>
-                    <span className="stat-value">$142,500</span>
-                  </div>
-                  <div className="stat-box">
-                    <span className="stat-label">Joined</span>
-                    <span className="stat-value text-normal">Mar 2021</span>
+                    <span>{ticket.contactNumber}</span>
                   </div>
                 </div>
               </div>
@@ -212,7 +259,7 @@ const AdminTicketDetails = () => {
                 </div>
                 <div className="detail-group">
                   <h5>Category</h5>
-                  <span className="category-pill">Order Issue - Damage</span>
+                  <span className="category-pill" style={{textTransform: 'capitalize'}}>{ticket.issueType}</span>
                 </div>
                 <div className="detail-group">
                   <h5>Resolution SLA</h5>

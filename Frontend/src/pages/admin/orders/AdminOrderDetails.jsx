@@ -139,12 +139,12 @@ const AdminOrderDetails = () => {
                           <div>
                             <h4>Premium Organic Fertilizer</h4>
                             <p>SKU: FRT-ORG-50</p>
-                            <p>$45.00 / bag</p>
+                            <p>₹45.00 / bag</p>
                           </div>
                         </div>
                       </td>
                       <td className="qty-val">10</td>
-                      <td className="total-val">$450.00</td>
+                      <td className="total-val">₹450.00</td>
                     </tr>
                     <tr>
                       <td>
@@ -153,12 +153,12 @@ const AdminOrderDetails = () => {
                           <div>
                             <h4>Heavy-Duty Irrigation Valve</h4>
                             <p>SKU: IRR-VLV-HD</p>
-                            <p>$120.00 / unit</p>
+                            <p>₹120.00 / unit</p>
                           </div>
                         </div>
                       </td>
                       <td className="qty-val">2</td>
-                      <td className="total-val">$240.00</td>
+                      <td className="total-val">₹240.00</td>
                     </tr>
                     <tr>
                       <td>
@@ -167,12 +167,12 @@ const AdminOrderDetails = () => {
                           <div>
                             <h4>Hybrid Corn Seed - Grade A</h4>
                             <p>SKU: SD-CRN-HA</p>
-                            <p>$85.00 / sack</p>
+                            <p>₹85.00 / sack</p>
                           </div>
                         </div>
                       </td>
                       <td className="qty-val">5</td>
-                      <td className="total-val">$425.00</td>
+                      <td className="total-val">₹425.00</td>
                     </tr>
                   </tbody>
                 </table>
@@ -181,19 +181,19 @@ const AdminOrderDetails = () => {
               <div className="order-summary">
                 <div className="summary-row">
                   <span>Subtotal (17 items)</span>
-                  <span>$1,115.00</span>
+                  <span>₹1,115.00</span>
                 </div>
                 <div className="summary-row">
                   <span>Shipping</span>
-                  <span>$150.00</span>
+                  <span>₹150.00</span>
                 </div>
                 <div className="summary-row">
                   <span>Tax (8.25%)</span>
-                  <span>$91.99</span>
+                  <span>₹91.99</span>
                 </div>
                 <div className="summary-row grand-total">
                   <span>Total</span>
-                  <span className="total-amount">$1,356.99</span>
+                  <span className="total-amount">₹1,356.99</span>
                 </div>
               </div>
             </div>

@@ -9,9 +9,9 @@ import {
   LifeBuoy, 
   BarChart3, 
   Settings, 
-  LogOut,
-  Sprout
+  LogOut
 } from 'lucide-react';
+import logo from '../../assets/images/logo/whiteThemeLogo.png';
 
 const AdminSidebar = () => {
   const location = useLocation();
@@ -20,21 +20,13 @@ const AdminSidebar = () => {
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
     { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
     { name: 'Products', path: '/admin/products', icon: Package },
-    { name: 'Inventory', path: '/admin/inventory', icon: ClipboardList },
-    { name: 'Customers', path: '/admin/customers', icon: Users },
     { name: 'Support', path: '/admin/support', icon: LifeBuoy },
-    { name: 'Reports', path: '/admin/reports', icon: BarChart3 },
-    { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];
 
   return (
     <div className="admin-sidebar">
-      <div className="admin-brand">
-        <Sprout className="brand-icon" size={32} />
-        <div className="brand-text">
-          <h2>AgriMart</h2>
-          <p>Admin Portal</p>
-        </div>
+      <div className="admin-brand" style={{ padding: '0px 24px 10px 24px', display: 'flex', alignItems: 'flex-start' }}>
+        <img src={logo} alt="AgriMart Logo" className="brand-icon" style={{ height: '75px', width: 'auto' }} />
       </div>
 
       <nav className="admin-nav">

@@ -18,6 +18,10 @@ app.use(express.json());
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', authRoutes);
+const adminRoutes = require('./routes/adminRoutes');
+const ticketRoutes = require('./routes/ticketRoutes');
+app.use('/api/admin', adminRoutes);
+app.use('/api/tickets', ticketRoutes);
 
 // Database Connection
 mongoose.connect('mongodb://localhost:27017/agrimart')

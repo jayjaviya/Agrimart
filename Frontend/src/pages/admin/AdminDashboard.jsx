@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { 
   Banknote, 
@@ -13,6 +13,34 @@ import {
 import '../../styles/admin/AdminDashboard.css';
 
 const AdminDashboard = () => {
+  const [dashboardData, setDashboardData] = useState({
+    totalRevenue: 0,
+    activeOrders: 0,
+    activeCustomers: 0,
+    inventoryAlertsCount: 0,
+    lowStockItems: [],
+    recentOrders: []
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        const response = await fetch(`${API_URL}/api/admin/dashboard`);
+        if (response.ok) {
+          const data = await response.json();
+          setDashboardData(data);
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, []);
+
   // Get current date formatted
   const today = new Date();
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -21,46 +49,37 @@ const AdminDashboard = () => {
   const kpis = [
     {
       title: 'Total Revenue',
-      value: '$124,500.00',
-      trend: '+12%',
+      value: `₹${(dashboardData.totalRevenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
+      trend: null,
       trendType: 'up',
       icon: Banknote,
       alert: false,
-      subtext: 'from last month'
+      subtext: 'Lifetime revenue'
     },
     {
       title: 'Active Orders',
-      value: '156',
+      value: dashboardData.activeOrders.toString(),
       icon: Truck,
       alert: false,
-      subtext: '24 pending shipment'
+      subtext: 'Processing or pending'
     },
     {
       title: 'Inventory Alerts',
-      value: '8',
+      value: dashboardData.inventoryAlertsCount.toString(),
       icon: AlertTriangle,
-      alert: true,
+      alert: dashboardData.inventoryAlertsCount > 0,
       subtext: 'Items low on stock'
     },
     {
       title: 'Active Customers',
-      value: '1,240',
+      value: dashboardData.activeCustomers.toString(),
       icon: Users,
       alert: false,
-      subtext: '5 new today'
+      subtext: 'Registered users'
     }
   ];
 
-  const lowStockItems = [
-    { name: 'Pro-Grade Submersible Pump', sku: 'PUMP-204', stock: 2, unit: 'left' },
-    { name: 'Premium Hybrid Corn Seed', sku: 'SEED-HC50', stock: 5, unit: 'bags' },
-    { name: 'Industrial Drip Line (100m)', sku: 'IRR-D100', stock: 1, unit: 'roll' },
-  ];
-
-  const recentOrders = [
-    { id: '#ORD-9082', customer: 'Midwest Agritech Co.', product: 'Irrigation Kit Pro', amount: '$4,250.00', status: 'Processing' },
-    { id: '#ORD-9081', customer: 'Valley Farms LLC', product: 'Bulk Fertilizer (Nitrogen)', amount: '$12,800.00', status: 'Shipped' },
-  ];
+  const { lowStockItems, recentOrders } = dashboardData;
 
   return (
     <AdminLayout 

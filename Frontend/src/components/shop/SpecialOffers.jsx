@@ -1,77 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { CartContext } from '../../context/CartContext';
+import AddToCartButton from './AddToCartButton';
 import { Star, Tag } from 'lucide-react';
-import seedsImg from '../../assets/images/premium-seeds.png';
-import fertilizersImg from '../../assets/images/fertilizers-nutrition.png';
-import toolsImg from '../../assets/images/tools-equipment.png';
-import cropImg from '../../assets/images/scout-drone.png';
-import irrigationImg from '../../assets/images/pivot-irrigation.png';
 import '../../styles/shop/SpecialOffers.css';
 
-const offers = [
-  {
-    id: 101,
-    category: 'Seeds',
-    name: 'Drought-Resistant Wheat Seed (50lb)',
-    oldPrice: 380.00,
-    newPrice: 335.50,
-    rating: 4.8,
-    reviews: 215,
-    image: seedsImg,
-    badge: '12% OFF'
-  },
-  {
-    id: 102,
-    category: 'Fertilizers',
-    name: 'NitroBoost Pro Liquid Complex 5 Gal',
-    oldPrice: 85.00,
-    newPrice: 65.00,
-    rating: 4.6,
-    reviews: 88,
-    image: fertilizersImg,
-    badge: '23% OFF'
-  },
-  {
-    id: 103,
-    category: 'Tools & Equipment',
-    name: 'Pro-Grade Submersible Pump 2HP',
-    oldPrice: 950.00,
-    newPrice: 845.00,
-    rating: 4.9,
-    reviews: 142,
-    image: toolsImg,
-    badge: '11% OFF'
-  },
-  {
-    id: 104,
-    category: 'Irrigation',
-    name: 'AquaSmart Digital Flow Controller',
-    oldPrice: 1050.00,
-    newPrice: 890.00,
-    rating: 5.0,
-    reviews: 45,
-    image: irrigationImg,
-    badge: '15% OFF'
-  },
-  {
-    id: 105,
-    category: 'Crop Protection',
-    name: 'AgriScout Surveillance Drone V2',
-    oldPrice: 2200.00,
-    newPrice: 1850.00,
-    rating: 4.7,
-    reviews: 310,
-    image: cropImg,
-    badge: '$350 OFF'
-  }
-];
-
 const SpecialOffers = () => {
+  const { addToCart } = useContext(CartContext);
+  const [offers, setOffers] = useState([]);
   const [visibleCount, setVisibleCount] = useState(3);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        const response = await fetch('http://localhost:5001/api/products');
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        const data = await response.json();
+        
+        // Take a subset of products to show as "Special Offers" (e.g., first 5 or highest rated)
+        // For now, we'll just take the first 5 and add dynamic discount badges
+        const specialOffers = data.slice(0, 5).map(product => {
+          // Generate an old price (e.g. 15-25% more) since our DB doesn't have it
+          const markup = 1 + (Math.floor(Math.random() * 10) + 15) / 100;
+          const oldPrice = product.price * markup;
+          const discountPercent = Math.round((1 - product.price / oldPrice) * 100);
+          
+          return {
+            ...product,
+            oldPrice: oldPrice,
+            newPrice: product.price,
+            badge: `${discountPercent}% OFF`
+          };
+        });
+
+        setOffers(specialOffers);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setError('Could not load special offers.');
+        setLoading(false);
+      }
+    };
+
+    fetchOffers();
+  }, []);
 
   const loadMore = () => {
     setVisibleCount(offers.length);
   };
+
+  if (loading) return <div style={{textAlign: 'center', padding: '50px'}}>Loading offers...</div>;
+  if (error) return null; // Hide section if error
 
   return (
     <section className="offers-section section" id="special-offers">
@@ -82,7 +65,7 @@ const SpecialOffers = () => {
 
       <div className="offers-grid">
         {offers.slice(0, visibleCount).map((offer) => (
-          <Link to={`/product/${offer.id}`} key={offer.id} className="offer-card">
+          <Link to={`/product/${offer._id}`} key={offer._id} className="offer-card">
             <div className="offer-badge"><Tag size={12} /> {offer.badge}</div>
             <div className="offer-img-wrap">
               <img src={offer.image} alt={offer.name} />
@@ -101,9 +84,12 @@ const SpecialOffers = () => {
                 <span>{offer.rating} ({offer.reviews})</span>
               </div>
               
-              <div className="offer-pricing">
-                <span className="old-price">${offer.oldPrice.toFixed(2)}</span>
-                <span className="new-price">${offer.newPrice.toFixed(2)}</span>
+              <div className="offer-pricing" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px' }}>
+                <div>
+                  <span className="old-price">₹{offer.oldPrice.toFixed(2)}</span>
+                  <span className="new-price" style={{ marginLeft: '10px' }}>₹{offer.newPrice.toFixed(2)}</span>
+                </div>
+                <AddToCartButton product={offer} />
               </div>
             </div>
           </Link>

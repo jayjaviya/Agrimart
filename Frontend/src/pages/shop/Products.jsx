@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CartContext } from '../../context/CartContext';
+import AddToCartButton from '../../components/shop/AddToCartButton';
 import { Search, Star } from 'lucide-react';
 import seedsImg from '../../assets/images/premium-seeds.png';
 import fertilizersImg from '../../assets/images/fertilizers-nutrition.png';
@@ -69,10 +70,10 @@ const Products = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const [priceFilters, setPriceFilters] = useState({
-    'Under $50': false,
-    '$50 - $200': false,
-    '$200 - $1000': false,
-    'Over $1000': false
+    'Under ₹50': false,
+    '₹50 - ₹200': false,
+    '₹200 - ₹1000': false,
+    'Over ₹1000': false
   });
 
 
@@ -138,10 +139,10 @@ const Products = () => {
     const activePrices = Object.keys(priceFilters).filter(k => priceFilters[k]);
     if (activePrices.length > 0) {
       let priceMatch = false;
-      if (priceFilters['Under $50'] && product.price < 50) priceMatch = true;
-      if (priceFilters['$50 - $200'] && product.price >= 50 && product.price <= 200) priceMatch = true;
-      if (priceFilters['$200 - $1000'] && product.price > 200 && product.price <= 1000) priceMatch = true;
-      if (priceFilters['Over $1000'] && product.price > 1000) priceMatch = true;
+      if (priceFilters['Under ₹50'] && product.price < 50) priceMatch = true;
+      if (priceFilters['₹50 - ₹200'] && product.price >= 50 && product.price <= 200) priceMatch = true;
+      if (priceFilters['₹200 - ₹1000'] && product.price > 200 && product.price <= 1000) priceMatch = true;
+      if (priceFilters['Over ₹1000'] && product.price > 1000) priceMatch = true;
       if (!priceMatch) return false;
     }
 
@@ -228,17 +229,8 @@ const Products = () => {
                     </div>
 
                     <div className="prod-footer">
-                      <span className="prod-price">${product.price.toFixed(2)}</span>
-                      <button 
-                        className="prod-add-btn"
-                        onClick={(e) => { 
-                          e.preventDefault(); 
-                          addToCart(product, 1);
-                          navigate('/cart'); 
-                        }}
-                      >
-                        ADD
-                      </button>
+                      <span className="prod-price">₹{product.price.toFixed(2)}</span>
+                      <AddToCartButton product={product} />
                     </div>
                   </div>
                 </Link>
