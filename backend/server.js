@@ -24,7 +24,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/tickets', ticketRoutes);
 
 // Database Connection
-mongoose.connect('mongodb://localhost:27017/agrimart')
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/agrimart')
 .then(() => console.log('MongoDB Connected successfully.'))
 .catch(err => console.error('MongoDB Connection Error:', err));
 

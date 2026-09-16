@@ -109,3 +109,6 @@ To access the admin dashboard, you can use the default seeded credentials (or cr
 
 ---
 *Created by Jay Javiya*
+
+
+<!-- mongodb+srv://jdjaviya98790_db_user:<db_password>@cluster0.ycmfi9h.mongodb.net/?appName=Cluster0 -->
