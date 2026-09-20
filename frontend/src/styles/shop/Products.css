@@ -36,38 +36,43 @@
   border-bottom: 1px solid var(--color-neutral-200);
   margin-bottom: var(--space-3xl);
   flex-wrap: wrap;
+  position: sticky;
+  top: 64px;
+  background-color: var(--color-neutral);
+  z-index: 10;
+  padding-top: 15px;
+  padding-bottom: 5px;
 }
 
-/* --- Search --- */
-.sp-search {
-  position: relative;
+/* --- Search Button (replaces input) --- */
+.sp-search-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   width: 100%;
   max-width: 320px;
   margin-bottom: var(--space-sm);
-}
-
-.sp-search .search-icon {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--color-neutral-500);
-}
-
-.sp-search input {
-  width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  padding: 0.75rem 1rem;
   border: 1px solid var(--color-neutral-300);
   border-radius: var(--radius-sm);
   background: var(--color-white);
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  transition: border-color var(--transition-fast);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.sp-search input:focus {
-  outline: none;
+.sp-search-btn:hover {
   border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.sp-search-btn .search-icon {
+  color: var(--color-neutral-400);
+}
+
+.sp-search-btn .search-placeholder {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--color-neutral-400);
 }
 
 /* --- Tabs --- */
@@ -117,6 +122,24 @@
 }
 
 /* --- Sidebar --- */
+.sp-sidebar {
+  position: sticky;
+  top: 155px; /* Adjust based on navbar height (64px) + controls height (~70px) + margins */
+  height: calc(100vh - 155px);
+  overflow-y: auto;
+  padding-bottom: 2rem;
+}
+.sp-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.sp-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sp-sidebar::-webkit-scrollbar-thumb {
+  background: var(--color-neutral-300);
+  border-radius: 4px;
+}
+
 .sp-filter-group {
   margin-bottom: var(--space-2xl);
 }

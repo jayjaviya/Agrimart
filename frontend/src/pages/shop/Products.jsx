@@ -52,6 +52,8 @@ const dummyProducts = [
   }
 ];
 
+import GlobalSearchModal from '../../components/shop/GlobalSearchModal';
+
 const Products = () => {
   const tabs = ['All Products', 'Seeds', 'Fertilizers', 'Crop Protection', 'Irrigation', 'Sprayers', 'Tools & Equipment'];
   const { addToCart } = useContext(CartContext);
@@ -67,7 +69,7 @@ const Products = () => {
 
   const [allProducts, setAllProducts] = useState(dummyProducts);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   const [priceFilters, setPriceFilters] = useState({
     'Under ₹50': false,
@@ -126,15 +128,6 @@ const Products = () => {
       if (product.category.toLowerCase() !== activeTab.toLowerCase()) return false;
     }
 
-    // Search match
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      if (!product.name.toLowerCase().includes(query) && 
-          !(product.description && product.description.toLowerCase().includes(query))) {
-        return false;
-      }
-    }
-
     // Price match
     const activePrices = Object.keys(priceFilters).filter(k => priceFilters[k]);
     if (activePrices.length > 0) {
@@ -157,31 +150,31 @@ const Products = () => {
         <header className="sp-header">
           <h1>Products for Better Farming</h1>
           <p>Explore quality products for every stage of your farming journey. High-performance equipment, premium seeds, and professional-grade supplies.</p>
-          
-          <div className="sp-controls">
-            <div className="sp-tabs">
-              {tabs.map(tab => (
-                <button 
-                  key={tab} 
-                  className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
-                  onClick={() => handleTabClick(tab)}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-
-            <div className="sp-search">
-              <Search className="search-icon" size={20} />
-              <input 
-                type="text" 
-                placeholder="Search products..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
         </header>
+
+        <div className="sp-controls">
+          <div className="sp-tabs">
+            {tabs.map(tab => (
+              <button 
+                key={tab} 
+                className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
+                onClick={() => handleTabClick(tab)}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          <button className="sp-search-btn" onClick={() => setIsSearchModalOpen(true)}>
+            <Search className="search-icon" size={20} />
+            <span className="search-placeholder">Search products...</span>
+          </button>
+        </div>
+
+        <GlobalSearchModal 
+          isOpen={isSearchModalOpen} 
+          onClose={() => setIsSearchModalOpen(false)} 
+        />
 
         <div className="sp-layout">
           <aside className="sp-sidebar">

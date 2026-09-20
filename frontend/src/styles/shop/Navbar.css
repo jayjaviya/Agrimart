@@ -248,7 +248,24 @@
   position: relative;
   display: flex;
   align-items: center;
+  gap: 8px;
   height: 100%;
+  cursor: pointer;
+}
+
+.nav-user-greeting {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  transition: all var(--transition-fast);
+}
+
+.navbar--transparent .nav-user-greeting {
+  color: var(--color-white);
+}
+
+.nav-user-wrapper:hover .nav-user-greeting {
+  opacity: 0.8;
 }
 
 .nav-dropdown {

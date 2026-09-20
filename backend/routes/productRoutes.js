@@ -5,8 +5,20 @@ const Product = require('../models/Product');
 // GET all products
 router.get('/', async (req, res) => {
   try {
+    const { search } = req.query;
+    let query = {};
+
+    if (search) {
+      query = {
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { description: { $regex: search, $options: 'i' } }
+        ]
+      };
+    }
+
     // Sort by newest first
-    const products = await Product.find({}).sort({ createdAt: -1 });
+    const products = await Product.find(query).sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
     console.error(error);

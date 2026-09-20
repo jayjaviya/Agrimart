@@ -267,3 +267,138 @@
 .admin-footer-links a:hover {
   text-decoration: underline;
 }
+
+/* Status Update Dropdown */
+.status-select {
+  display: inline-block;
+  padding: 6px 24px 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  border-left: 3px solid transparent;
+  background-color: #f8fafc;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: #cbd5e1;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.1);
+}
+
+.status-select.status-processing {
+  color: #d97706;
+  border-left-color: #f59e0b;
+  background-color: #fef3c7;
+}
+
+.status-select.status-shipped {
+  color: #2563eb;
+  border-left-color: #3b82f6;
+  background-color: #dbeafe;
+}
+
+.status-select.status-delivered {
+  color: #16a34a;
+  border-left-color: #22c55e;
+  background-color: #dcfce7;
+}
+
+.status-select.status-cancelled {
+  color: #dc2626;
+  border-left-color: #ef4444;
+  background-color: #fee2e2;
+}
+
+/* Status Confirm Modal */
+.status-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.status-modal {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.3s ease;
+}
+
+.status-modal h3 {
+  margin: 0 0 16px 0;
+  color: #0f172a;
+  font-size: 1.25rem;
+}
+
+.status-modal p {
+  color: #475569;
+  margin: 0 0 24px 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.status-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.status-btn-cancel {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #475569;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.status-btn-cancel:hover {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.status-btn-confirm {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background: #0f172a;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.status-btn-confirm:hover {
+  background: #334155;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

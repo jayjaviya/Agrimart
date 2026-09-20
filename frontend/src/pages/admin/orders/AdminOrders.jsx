@@ -7,6 +7,7 @@ import '../../../styles/admin/orders/AdminOrders.css';
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, orderId: null, newStatus: '', currentStatus: '' });
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -36,6 +37,48 @@ const AdminOrders = () => {
     return `${items[0].name} +${items.length - 1} more`;
   };
 
+  const handleStatusSelect = (e, order) => {
+    const newStatus = e.target.value;
+    if (newStatus !== order.status) {
+      setConfirmDialog({
+        isOpen: true,
+        orderId: order._id, // use MongoDB _id for API call
+        displayId: order.orderId,
+        currentStatus: order.status,
+        newStatus: newStatus
+      });
+    }
+  };
+
+  const confirmStatusChange = async () => {
+    try {
+      const res = await fetch(`http://localhost:5001/api/orders/${confirmDialog.orderId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: confirmDialog.newStatus })
+      });
+      
+      if (res.ok) {
+        setOrders(prevOrders => prevOrders.map(order => 
+          order._id === confirmDialog.orderId 
+            ? { ...order, status: confirmDialog.newStatus } 
+            : order
+        ));
+      } else {
+        alert('Failed to update status');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error updating status');
+    } finally {
+      setConfirmDialog({ isOpen: false, orderId: null, newStatus: '', currentStatus: '' });
+    }
+  };
+
+  const cancelStatusChange = () => {
+    setConfirmDialog({ isOpen: false, orderId: null, newStatus: '', currentStatus: '' });
+  };
+
   return (
     <AdminLayout 
       headerTitle="Orders" 
@@ -61,6 +104,7 @@ const AdminOrders = () => {
               <option>Processing</option>
               <option>Shipped</option>
               <option>Delivered</option>
+              <option>Cancelled</option>
             </select>
             <select className="filter-select">
               <option>All Payments</option>
@@ -111,9 +155,16 @@ const AdminOrders = () => {
                       </span>
                     </td>
                     <td>
-                      <span className={`status-label status-${order.status.toLowerCase()}`}>
-                        {order.status}
-                      </span>
+                      <select 
+                        className={`status-select status-${order.status.toLowerCase()}`}
+                        value={order.status}
+                        onChange={(e) => handleStatusSelect(e, order)}
+                      >
+                        <option value="Processing">Processing</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
                     </td>
                     <td style={{ color: '#475569', fontSize: '0.85rem' }}>{new Date(order.createdAt).toLocaleDateString()}</td>
                   </tr>
@@ -141,6 +192,22 @@ const AdminOrders = () => {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {confirmDialog.isOpen && (
+        <div className="status-modal-overlay">
+          <div className="status-modal">
+            <h3>Update Order Status</h3>
+            <p>
+              Are you sure you want to change the status of order <strong>{confirmDialog.displayId}</strong> to <strong>{confirmDialog.newStatus}</strong>?
+            </p>
+            <div className="status-modal-actions">
+              <button className="status-btn-cancel" onClick={cancelStatusChange}>Cancel</button>
+              <button className="status-btn-confirm" onClick={confirmStatusChange}>Yes, Update Status</button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 };

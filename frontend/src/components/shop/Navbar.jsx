@@ -60,6 +60,9 @@ const Navbar = () => {
               <div className="nav-icon" aria-label="Account">
                 <User />
               </div>
+              <span className="nav-user-greeting">
+                Hello, {user.name ? user.name.split(' ')[0] : 'User'}
+              </span>
               
               <div className={`nav-dropdown ${dropdownOpen ? 'nav-dropdown--open' : ''}`}>
                 <div className="nav-dropdown-header">
